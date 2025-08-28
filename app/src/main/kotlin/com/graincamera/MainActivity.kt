@@ -231,49 +231,84 @@ class MainActivity : ComponentActivity() {
     }
     
     private fun applyFilterToBitmap(bitmap: Bitmap, renderer: com.graincamera.gl.GLRenderer): Bitmap {
-        try {
-            // Try to capture the actual rendered frame from OpenGL
-            android.util.Log.d("MainActivity", "Attempting OpenGL capture for filtered image")
-            val filteredBitmap = renderer.captureCurrentFrame()
-            android.util.Log.d("MainActivity", "OpenGL capture successful: ${filteredBitmap.width}x${filteredBitmap.height}")
-            return filteredBitmap
-        } catch (e: Exception) {
-            // Fallback to basic filter application if OpenGL capture fails
-            android.util.Log.w("MainActivity", "OpenGL capture failed, using fallback: ${e.message}")
-            val params = renderer.params
-            val film = params.film
-            
-            // Create a mutable copy of the bitmap
-            val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-            val canvas = android.graphics.Canvas(mutableBitmap)
-            
-            // Apply film simulation effects
-            val paint = android.graphics.Paint().apply {
-                // Apply contrast
+        val params = renderer.params
+        val film = params.film
+        
+        // Create a mutable copy of the bitmap
+        val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+        val canvas = android.graphics.Canvas(mutableBitmap)
+        
+        // Apply film simulation effects with enhanced processing
+        val paint = android.graphics.Paint().apply {
+            // Apply saturation and basic color adjustments
+            colorFilter = android.graphics.ColorMatrixColorFilter(
+                android.graphics.ColorMatrix().apply {
+                    setSaturation(film.saturation)
+                }
+            )
+        }
+        
+        // Apply the paint to the canvas
+        canvas.drawBitmap(bitmap, 0f, 0f, paint)
+        
+        // For Acros B&W, apply additional black and white conversion
+        if (film.saturation == 0.0f) {
+            val bwPaint = android.graphics.Paint().apply {
                 colorFilter = android.graphics.ColorMatrixColorFilter(
                     android.graphics.ColorMatrix().apply {
-                        setSaturation(film.saturation)
+                        setSaturation(0f) // Make it black and white
                     }
                 )
             }
-            
-            // Apply the paint to the canvas
-            canvas.drawBitmap(bitmap, 0f, 0f, paint)
-            
-            // For Acros B&W, apply additional black and white conversion
-            if (film.saturation == 0.0f) {
-                val bwPaint = android.graphics.Paint().apply {
-                    colorFilter = android.graphics.ColorMatrixColorFilter(
-                        android.graphics.ColorMatrix().apply {
-                            setSaturation(0f) // Make it black and white
-                        }
-                    )
-                }
-                canvas.drawBitmap(mutableBitmap, 0f, 0f, bwPaint)
+            canvas.drawBitmap(mutableBitmap, 0f, 0f, bwPaint)
+        }
+        
+        // Apply additional effects to simulate halation and bloom
+        if (params.halation > 0.0f || params.bloom > 0.0f) {
+            val effectPaint = android.graphics.Paint().apply {
+                // Create a blur effect to simulate bloom
+                maskFilter = android.graphics.BlurMaskFilter(
+                    params.bloom * 10f, 
+                    android.graphics.BlurMaskFilter.Blur.NORMAL
+                )
+                alpha = (params.halation * 255).toInt()
             }
             
-            return mutableBitmap
+            // Draw the blurred version on top
+            canvas.drawBitmap(mutableBitmap, 0f, 0f, effectPaint)
         }
+        
+        // Apply grain effect
+        if (params.grain > 0.0f) {
+            applyGrainEffect(mutableBitmap, params.grain)
+        }
+        
+        return mutableBitmap
+    }
+    
+    private fun applyGrainEffect(bitmap: Bitmap, grainIntensity: Float) {
+        val pixels = IntArray(bitmap.width * bitmap.height)
+        bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+        
+        val random = java.util.Random()
+        val grainAmount = (grainIntensity * 50).toInt()
+        
+        for (i in pixels.indices) {
+            val pixel = pixels[i]
+            val r = android.graphics.Color.red(pixel)
+            val g = android.graphics.Color.green(pixel)
+            val b = android.graphics.Color.blue(pixel)
+            
+            val noise = random.nextInt(grainAmount * 2 + 1) - grainAmount
+            
+            val newR = (r + noise).coerceIn(0, 255)
+            val newG = (g + noise).coerceIn(0, 255)
+            val newB = (b + noise).coerceIn(0, 255)
+            
+            pixels[i] = android.graphics.Color.rgb(newR, newG, newB)
+        }
+        
+        bitmap.setPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
     }
     
 
