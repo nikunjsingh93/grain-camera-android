@@ -32,12 +32,33 @@ import android.view.View
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import kotlin.math.exp
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
+import android.content.Context
+import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.work.WorkManager
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkRequest
+import androidx.work.Data
+import java.util.concurrent.atomic.AtomicInteger
+import java.io.File
+import com.graincamera.gl.EffectParams
 
 class MainActivity : ComponentActivity() {
     private var cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private val cameraExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private var imageCapture: ImageCapture? = null
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
+    
+    // Background processing
+    private lateinit var notificationManager: NotificationManager
+    private lateinit var workManager: WorkManager
+    private val processingCounter = AtomicInteger(0)
+    private val CHANNEL_ID = "photo_processing"
+    private val NOTIFICATION_ID = 1001
 
     private val requestPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -50,9 +71,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Initialize background processing
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        workManager = WorkManager.getInstance(applicationContext)
+        createNotificationChannel()
+
         val glView: AspectRatioGLSurfaceView = findViewById(R.id.glView)
         glView.setZOrderOnTop(false)
-
 
         setupUI(glView)
 
@@ -153,15 +178,17 @@ class MainActivity : ComponentActivity() {
         return bitmap
     }
     
-    private fun takePhoto() {
+        private fun takePhoto() {
         val ic = imageCapture ?: run {
             Toast.makeText(this, "Camera not ready yet.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        Toast.makeText(this, getString(R.string.saving), Toast.LENGTH_SHORT).show()
+        // Show immediate feedback
+        Toast.makeText(this, "Photo captured! Processing in background...", Toast.LENGTH_SHORT).show()
+        showProcessingNotification()
 
-        // Use ImageCapture with a callback to process the captured image
+        // Use ImageCapture with a callback to queue the image for background processing
         ic.takePicture(
             ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageCapturedCallback() {
@@ -170,45 +197,21 @@ class MainActivity : ComponentActivity() {
                         // Convert ImageProxy to Bitmap
                         val bitmap = imageProxyToBitmap(image)
                         
-                        // Apply the current filter effects to the bitmap
-                        val glView: AspectRatioGLSurfaceView = findViewById(R.id.glView)
-                        val renderer = glView.renderer
-                        val filteredBitmap = applyFilterToBitmap(bitmap, renderer)
-                        
-                        // Save the filtered bitmap
-                        val name = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(System.currentTimeMillis())
-                        val contentValues = ContentValues().apply {
-                            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-                            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-                            if (Build.VERSION.SDK_INT >= 29) {
-                                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/GrainCamera")
-                            }
-                        }
-                        
-                        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-                        uri?.let { imageUri ->
-                            contentResolver.openOutputStream(imageUri)?.use { outputStream ->
-                                filteredBitmap.compress(Bitmap.CompressFormat.JPEG, 95, outputStream)
-                            }
-                            Toast.makeText(this@MainActivity, "Photo saved successfully!", Toast.LENGTH_SHORT).show()
-                        } ?: run {
-                            Toast.makeText(this@MainActivity, "Failed to save photo", Toast.LENGTH_LONG).show()
-                        }
-                        
-                        // Clean up
-                        bitmap.recycle()
-                        filteredBitmap.recycle()
+                        // Queue for background processing
+                        queuePhotoForProcessing(bitmap)
                         
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        Toast.makeText(this@MainActivity, "Failed to process photo: ${e.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@MainActivity, "Failed to capture photo: ${e.message}", Toast.LENGTH_LONG).show()
+                        hideProcessingNotification()
                     } finally {
                         image.close()
                     }
                 }
-                
+
                 override fun onError(exc: ImageCaptureException) {
                     Toast.makeText(this@MainActivity, "Capture failed: ${exc.message}", Toast.LENGTH_LONG).show()
+                    hideProcessingNotification()
                 }
             }
         )
@@ -300,6 +303,94 @@ class MainActivity : ComponentActivity() {
         }
         
         bitmap.setPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+    }
+
+    // Background processing methods
+    private fun createNotificationChannel() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Photo Processing",
+                NotificationManager.IMPORTANCE_LOW
+            ).apply {
+                description = "Shows progress of photo processing"
+                setShowBadge(false)
+            }
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun showProcessingNotification() {
+        val count = processingCounter.incrementAndGet()
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Processing Photos")
+            .setContentText("$count photo${if (count > 1) "s" else ""} in queue")
+            .setSmallIcon(android.R.drawable.ic_menu_camera)
+            .setOngoing(true)
+            .setProgress(0, 0, true)
+            .build()
+        
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
+
+    private fun hideProcessingNotification() {
+        val count = processingCounter.decrementAndGet()
+        if (count <= 0) {
+            notificationManager.cancel(NOTIFICATION_ID)
+        } else {
+            val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Processing Photos")
+                .setContentText("$count photo${if (count > 1) "s" else ""} remaining")
+                .setSmallIcon(android.R.drawable.ic_menu_camera)
+                .setOngoing(true)
+                .setProgress(0, 0, true)
+                .build()
+            
+            notificationManager.notify(NOTIFICATION_ID, notification)
+        }
+    }
+
+    private fun queuePhotoForProcessing(bitmap: Bitmap) {
+        try {
+            // Get current filter parameters
+            val glView: AspectRatioGLSurfaceView = findViewById(R.id.glView)
+            val renderer = glView.renderer
+            val params = renderer.params
+            
+            // Save bitmap to temporary file
+            val timestamp = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(System.currentTimeMillis())
+            val tempFile = File(cacheDir, "temp_photo_$timestamp.jpg")
+            
+            tempFile.outputStream().use { outputStream ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 95, outputStream)
+            }
+            
+            // Create work data
+            val inputData = Data.Builder()
+                .putString("timestamp", timestamp)
+                .putString("tempFilePath", tempFile.absolutePath)
+                .putFloat("halation", params.halation)
+                .putFloat("bloom", params.bloom)
+                .putFloat("grain", params.grain)
+                .putFloat("saturation", params.film.saturation)
+                .putString("filmName", "PROVIA") // Default film simulation
+                .build()
+            
+            // Create and enqueue the work
+            val photoProcessingWork: WorkRequest = OneTimeWorkRequestBuilder<PhotoProcessingWorker>()
+                .setInputData(inputData)
+                .build()
+            
+            workManager.enqueue(photoProcessingWork)
+            
+            // Clean up the original bitmap
+            bitmap.recycle()
+            
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Error queuing photo for processing", e)
+            bitmap.recycle()
+            hideProcessingNotification()
+        }
     }
     
     private fun applyHalationAndBloom(bitmap: Bitmap, halationIntensity: Float, bloomIntensity: Float) {
