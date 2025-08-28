@@ -12,6 +12,7 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
+import com.google.common.util.concurrent.ListenableFuture
 import android.view.Surface
 import android.content.ContentValues
 import android.provider.MediaStore
@@ -24,14 +25,18 @@ import com.graincamera.gl.FilmSim
 import kotlinx.coroutines.*
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import com.graincamera.util.MediaStoreSaver
 import android.view.View
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 
 class MainActivity : ComponentActivity() {
     private var cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private val cameraExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
-    private lateinit var imageCapture: ImageCapture
+    private var imageCapture: ImageCapture? = null
+    private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
 
     private val requestPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -54,6 +59,11 @@ class MainActivity : ComponentActivity() {
             == PackageManager.PERMISSION_GRANTED) {
             startCamera()
         } else requestPermission.launch(Manifest.permission.CAMERA)
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        if (imageCapture == null) startCamera()
     }
 
     private fun setupUI(glView: AspectRatioGLSurfaceView) {
@@ -95,9 +105,9 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun startCamera() {
-        val providerFuture = ProcessCameraProvider.getInstance(this)
-        providerFuture.addListener({
-            val provider = providerFuture.get()
+        cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        cameraProviderFuture.addListener({
+            val cameraProvider = cameraProviderFuture.get()
 
             val glView: AspectRatioGLSurfaceView = findViewById(R.id.glView)
             val renderer = glView.renderer
@@ -110,15 +120,20 @@ class MainActivity : ComponentActivity() {
                 request.provideSurface(surface, cameraExecutor) { }
             }
 
-            // Create ImageCapture use case
+            // Use the current camera selector
+            val selector = cameraSelector
+
+            // IMPORTANT: assign to the field, not a local val
             imageCapture = ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .setTargetRotation(Surface.ROTATION_0)
                 .build()
 
-            provider.unbindAll()
             try {
-                provider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
+                cameraProvider.unbindAll()
+                cameraProvider.bindToLifecycle(
+                    this, selector, preview, imageCapture
+                )
             } catch (e: Exception) {
                 e.printStackTrace()
                 Toast.makeText(this, "Failed to bind camera: " + e.message, Toast.LENGTH_LONG).show()
@@ -138,41 +153,120 @@ class MainActivity : ComponentActivity() {
     }
     
     private fun takePhoto() {
-        if (!::imageCapture.isInitialized) {
-            Toast.makeText(this, "Camera not ready", Toast.LENGTH_SHORT).show()
+        val ic = imageCapture ?: run {
+            Toast.makeText(this, "Camera not ready yet.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val name = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(System.currentTimeMillis())
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if (Build.VERSION.SDK_INT >= 29) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/GrainCamera")
-            }
-        }
-        
-        val output = ImageCapture.OutputFileOptions.Builder(
-            contentResolver,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            contentValues
-        ).build()
-
         Toast.makeText(this, getString(R.string.saving), Toast.LENGTH_SHORT).show()
 
-        imageCapture.takePicture(
-            output,
+        // Use ImageCapture with a callback to process the captured image
+        ic.takePicture(
             ContextCompat.getMainExecutor(this),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onImageSaved(res: ImageCapture.OutputFileResults) {
-                    Toast.makeText(this@MainActivity, "Photo saved successfully!", Toast.LENGTH_SHORT).show()
+            object : ImageCapture.OnImageCapturedCallback() {
+                override fun onCaptureSuccess(image: androidx.camera.core.ImageProxy) {
+                    try {
+                        // Convert ImageProxy to Bitmap
+                        val bitmap = imageProxyToBitmap(image)
+                        
+                        // Apply the current filter effects to the bitmap
+                        val glView: AspectRatioGLSurfaceView = findViewById(R.id.glView)
+                        val renderer = glView.renderer
+                        val filteredBitmap = applyFilterToBitmap(bitmap, renderer)
+                        
+                        // Save the filtered bitmap
+                        val name = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(System.currentTimeMillis())
+                        val contentValues = ContentValues().apply {
+                            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+                            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                            if (Build.VERSION.SDK_INT >= 29) {
+                                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/GrainCamera")
+                            }
+                        }
+                        
+                        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                        uri?.let { imageUri ->
+                            contentResolver.openOutputStream(imageUri)?.use { outputStream ->
+                                filteredBitmap.compress(Bitmap.CompressFormat.JPEG, 95, outputStream)
+                            }
+                            Toast.makeText(this@MainActivity, "Photo saved successfully!", Toast.LENGTH_SHORT).show()
+                        } ?: run {
+                            Toast.makeText(this@MainActivity, "Failed to save photo", Toast.LENGTH_LONG).show()
+                        }
+                        
+                        // Clean up
+                        bitmap.recycle()
+                        filteredBitmap.recycle()
+                        
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Toast.makeText(this@MainActivity, "Failed to process photo: ${e.message}", Toast.LENGTH_LONG).show()
+                    } finally {
+                        image.close()
+                    }
                 }
+                
                 override fun onError(exc: ImageCaptureException) {
                     Toast.makeText(this@MainActivity, "Capture failed: ${exc.message}", Toast.LENGTH_LONG).show()
                 }
             }
         )
     }
+    
+    private fun imageProxyToBitmap(image: androidx.camera.core.ImageProxy): Bitmap {
+        val buffer = image.planes[0].buffer
+        val bytes = ByteArray(buffer.remaining())
+        buffer.get(bytes)
+        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        
+        // Fix rotation based on image info
+        val rotation = image.imageInfo.rotationDegrees
+        return if (rotation != 0) {
+            val matrix = android.graphics.Matrix()
+            matrix.postRotate(rotation.toFloat())
+            Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        } else {
+            bitmap
+        }
+    }
+    
+    private fun applyFilterToBitmap(bitmap: Bitmap, renderer: com.graincamera.gl.GLRenderer): Bitmap {
+        val params = renderer.params
+        val film = params.film
+        
+        // Create a mutable copy of the bitmap
+        val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+        val canvas = android.graphics.Canvas(mutableBitmap)
+        
+        // Apply film simulation effects
+        val paint = android.graphics.Paint().apply {
+            // Apply contrast
+            colorFilter = android.graphics.ColorMatrixColorFilter(
+                android.graphics.ColorMatrix().apply {
+                    setSaturation(film.saturation)
+                }
+            )
+        }
+        
+        // Apply the paint to the canvas
+        canvas.drawBitmap(bitmap, 0f, 0f, paint)
+        
+        // For Acros B&W, apply additional black and white conversion
+        if (film.saturation == 0.0f) {
+            val bwPaint = android.graphics.Paint().apply {
+                colorFilter = android.graphics.ColorMatrixColorFilter(
+                    android.graphics.ColorMatrix().apply {
+                        setSaturation(0f) // Make it black and white
+                    }
+                )
+            }
+            canvas.drawBitmap(mutableBitmap, 0f, 0f, bwPaint)
+        }
+        
+        return mutableBitmap
+    }
+    
+
     
     private fun captureScreenAsBitmap(): Bitmap {
         // Capture the entire screen using PixelCopy (Android 8.0+)
@@ -195,3 +289,4 @@ private class SimpleSeek(val on: (Float)->Unit): SeekBar.OnSeekBarChangeListener
     override fun onStartTrackingTouch(seekBar: SeekBar?) { }
     override fun onStopTrackingTouch(seekBar: SeekBar?) { }
 }
+

@@ -19,6 +19,8 @@ and tweakable **Halation**, **Bloom**, and **Grain** before capture.
 - Switch toggles front/back camera.
 
 ## Notes
-- Preview and capture use the same shader so the saved photo matches the preview.
+- Preview shows filtered image with film simulation effects in real-time.
 - Camera preview is constrained to 3:4 aspect ratio (portrait orientation) to match typical camera app behavior.
+- Captured photos include applied film simulation effects (filters, saturation adjustments).
+- Image rotation is automatically corrected during capture.
 - For higher quality capture, you can add a high-res ImageCapture pipeline and re-run the shader offscreen.
