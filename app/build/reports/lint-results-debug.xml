@@ -14,7 +14,7 @@
         errorLine1="    &lt;uses-permission android:name=&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot; />"
         errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml"
             line="3"
             column="36"/>
     </issue>
@@ -32,7 +32,7 @@
         errorLine1="        targetSdk = 34"
         errorLine2="        ~~~~~~~~~~~~~~">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build.gradle.kts"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/build.gradle.kts"
             line="21"
             column="9"/>
     </issue>
@@ -48,7 +48,7 @@
         errorLine1="    implementation(&quot;androidx.core:core-ktx:1.13.1&quot;)"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build.gradle.kts"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/build.gradle.kts"
             line="48"
             column="20"/>
     </issue>
@@ -64,7 +64,7 @@
         errorLine1="    implementation(&quot;androidx.appcompat:appcompat:1.7.0&quot;)"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build.gradle.kts"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/build.gradle.kts"
             line="49"
             column="20"/>
     </issue>
@@ -80,7 +80,7 @@
         errorLine1="    implementation(&quot;androidx.camera:camera-core:$cameraXVersion&quot;)"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build.gradle.kts"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/build.gradle.kts"
             line="54"
             column="20"/>
     </issue>
@@ -96,7 +96,7 @@
         errorLine1="    implementation(&quot;androidx.camera:camera-camera2:$cameraXVersion&quot;)"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build.gradle.kts"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/build.gradle.kts"
             line="55"
             column="20"/>
     </issue>
@@ -112,7 +112,7 @@
         errorLine1="    implementation(&quot;androidx.camera:camera-lifecycle:$cameraXVersion&quot;)"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build.gradle.kts"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/build.gradle.kts"
             line="56"
             column="20"/>
     </issue>
@@ -128,7 +128,7 @@
         errorLine1="    implementation(&quot;androidx.camera:camera-video:$cameraXVersion&quot;)"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build.gradle.kts"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/build.gradle.kts"
             line="57"
             column="20"/>
     </issue>
@@ -144,7 +144,7 @@
         errorLine1="    implementation(&quot;androidx.camera:camera-view:$cameraXVersion&quot;)"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build.gradle.kts"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/build.gradle.kts"
             line="58"
             column="20"/>
     </issue>
@@ -160,7 +160,7 @@
         errorLine1="    implementation(&quot;androidx.lifecycle:lifecycle-runtime-ktx:2.8.4&quot;)"
         errorLine2="                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build.gradle.kts"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/build.gradle.kts"
             line="61"
             column="20"/>
     </issue>
@@ -174,7 +174,7 @@
         summary="Obsolete SDK_INT Version Check"
         explanation="This check flags version checks that are not necessary, because the `minSdkVersion` (or surrounding known API level) is already at least as high as the version checked for.&#xA;&#xA;Similarly, it also looks for resources in `-vNN` folders, such as `values-v14` where the version qualifier is less than or equal to the `minSdkVersion`, where the contents should be merged into the best folder.">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/res/mipmap-anydpi-v26"/>
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/src/main/res/mipmap-anydpi-v26"/>
     </issue>
 
     <issue
@@ -190,7 +190,7 @@
         errorLine1="&lt;FrameLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/res/layout/activity_main.xml"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/src/main/res/layout/activity_main.xml"
             line="1"
             column="1"/>
     </issue>
@@ -206,7 +206,7 @@
         errorLine1="&lt;adaptive-icon xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
         errorLine2="^">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml"
             line="1"
             column="1"/>
     </issue>
@@ -222,7 +222,7 @@
         errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2="^">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/res/drawable/ic_switch_camera.xml"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/src/main/res/drawable/ic_switch_camera.xml"
             line="1"
             column="1"/>
     </issue>
@@ -238,7 +238,7 @@
         errorLine1="&lt;adaptive-icon xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
         errorLine2="^">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml"
             line="1"
             column="1"/>
     </issue>
@@ -254,8 +254,8 @@
         errorLine1="                android:paddingEnd=&quot;8dp&quot;/>"
         errorLine2="                ~~~~~~~~~~~~~~~~~~">
         <location
-            file="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/res/layout/activity_main.xml"
-            line="33"
+            file="/Users/m4air/Documents/Projects/grain-camera-android/app/src/main/res/layout/activity_main.xml"
+            line="40"
             column="17"/>
     </issue>
 

@@ -32,10 +32,10 @@ com.graincamera.app-drawerlayout-1.1.1-30 /Users/m4air/.gradle/caches/9.0-milest
 com.graincamera.app-jetified-camera-core-1.3.4-31 /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/e62531a3dd7d5447989bf405b3d11f39/transformed/jetified-camera-core-1.3.4/res
 com.graincamera.app-core-1.13.1-32 /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/e74d94c030260e86f28254873e80c103/transformed/core-1.13.1/res
 com.graincamera.app-jetified-camera-video-1.3.4-33 /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/fe8182db653a5131e354950a3890272a/transformed/jetified-camera-video-1.3.4/res
-com.graincamera.app-pngs-34 /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build/generated/res/pngs/release
-com.graincamera.app-resValues-35 /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build/generated/res/resValues/release
-com.graincamera.app-packageReleaseResources-36 /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build/intermediates/incremental/release/packageReleaseResources/merged.dir
-com.graincamera.app-packageReleaseResources-37 /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build/intermediates/incremental/release/packageReleaseResources/stripped.dir
-com.graincamera.app-release-38 /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build/intermediates/merged_res/release/mergeReleaseResources
-com.graincamera.app-main-39 /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/res
-com.graincamera.app-release-40 /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/release/res
+com.graincamera.app-pngs-34 /Users/m4air/Documents/Projects/grain-camera-android/app/build/generated/res/pngs/release
+com.graincamera.app-resValues-35 /Users/m4air/Documents/Projects/grain-camera-android/app/build/generated/res/resValues/release
+com.graincamera.app-packageReleaseResources-36 /Users/m4air/Documents/Projects/grain-camera-android/app/build/intermediates/incremental/release/packageReleaseResources/merged.dir
+com.graincamera.app-packageReleaseResources-37 /Users/m4air/Documents/Projects/grain-camera-android/app/build/intermediates/incremental/release/packageReleaseResources/stripped.dir
+com.graincamera.app-release-38 /Users/m4air/Documents/Projects/grain-camera-android/app/build/intermediates/merged_res/release/mergeReleaseResources
+com.graincamera.app-main-39 /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/res
+com.graincamera.app-release-40 /Users/m4air/Documents/Projects/grain-camera-android/app/src/release/res

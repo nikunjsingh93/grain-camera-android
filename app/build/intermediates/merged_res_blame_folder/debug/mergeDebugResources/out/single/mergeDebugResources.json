@@ -1,22 +1,26 @@
 [
     {
-        "merged": "com.graincamera.app-debug-38:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "com.graincamera.app-main-40:/mipmap-anydpi-v26/ic_launcher_round.xml"
+        "merged": "/Users/m4air/.gradle/daemon/9.0-milestone-1/com.graincamera.app-debug-38:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "/Users/m4air/.gradle/daemon/9.0-milestone-1/com.graincamera.app-main-40:/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
-        "merged": "com.graincamera.app-debug-38:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "com.graincamera.app-main-40:/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "/Users/m4air/.gradle/daemon/9.0-milestone-1/com.graincamera.app-debug-38:/drawable_ic_switch_camera.xml.flat",
+        "source": "/Users/m4air/.gradle/daemon/9.0-milestone-1/com.graincamera.app-main-40:/drawable/ic_switch_camera.xml"
     },
     {
-        "merged": "com.graincamera.app-debug-38:/layout_activity_main.xml.flat",
-        "source": "com.graincamera.app-main-40:/layout/activity_main.xml"
+        "merged": "/Users/m4air/.gradle/daemon/9.0-milestone-1/com.graincamera.app-debug-38:/layout_activity_main.xml.flat",
+        "source": "/Users/m4air/.gradle/daemon/9.0-milestone-1/com.graincamera.app-main-40:/layout/activity_main.xml"
     },
     {
-        "merged": "com.graincamera.app-debug-38:/drawable_ic_switch_camera.xml.flat",
-        "source": "com.graincamera.app-main-40:/drawable/ic_switch_camera.xml"
+        "merged": "/Users/m4air/.gradle/daemon/9.0-milestone-1/com.graincamera.app-debug-38:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "/Users/m4air/.gradle/daemon/9.0-milestone-1/com.graincamera.app-main-40:/drawable/ic_launcher_foreground.xml"
     },
     {
-        "merged": "com.graincamera.app-debug-38:/drawable_ic_launcher_foreground.xml.flat",
-        "source": "com.graincamera.app-main-40:/drawable/ic_launcher_foreground.xml"
+        "merged": "/Users/m4air/.gradle/daemon/9.0-milestone-1/com.graincamera.app-debug-38:/drawable_preview_border.xml.flat",
+        "source": "/Users/m4air/.gradle/daemon/9.0-milestone-1/com.graincamera.app-main-40:/drawable/preview_border.xml"
+    },
+    {
+        "merged": "/Users/m4air/.gradle/daemon/9.0-milestone-1/com.graincamera.app-debug-38:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "/Users/m4air/.gradle/daemon/9.0-milestone-1/com.graincamera.app-main-40:/mipmap-anydpi-v26/ic_launcher_round.xml"
     }
 ]

@@ -1,6 +1,6 @@
 <lint-module
     format="1"
-    dir="/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app"
+    dir="/Users/m4air/Documents/Projects/grain-camera-android/app"
     name=":app"
     type="APP"
     maven="GrainCamera:app:unspecified"

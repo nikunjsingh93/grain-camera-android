@@ -20,4 +20,5 @@ and tweakable **Halation**, **Bloom**, and **Grain** before capture.
 
 ## Notes
 - Preview and capture use the same shader so the saved photo matches the preview.
+- Camera preview is constrained to 3:4 aspect ratio (portrait orientation) to match typical camera app behavior.
 - For higher quality capture, you can add a high-res ImageCapture pipeline and re-run the shader offscreen.

@@ -19,7 +19,7 @@ import android.os.Build
 import java.text.SimpleDateFormat
 import java.util.Locale
 import com.graincamera.R
-import com.graincamera.gl.CameraGLSurfaceView
+import com.graincamera.AspectRatioGLSurfaceView
 import com.graincamera.gl.FilmSim
 import kotlinx.coroutines.*
 import androidx.lifecycle.lifecycleScope
@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val glView: CameraGLSurfaceView = findViewById(R.id.glView)
+        val glView: AspectRatioGLSurfaceView = findViewById(R.id.glView)
         glView.setZOrderOnTop(false)
 
 
@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
         } else requestPermission.launch(Manifest.permission.CAMERA)
     }
 
-    private fun setupUI(glView: CameraGLSurfaceView) {
+    private fun setupUI(glView: AspectRatioGLSurfaceView) {
         val renderer = glView.renderer
 
         val spinner = findViewById<Spinner>(R.id.filmSpinner)
@@ -99,7 +99,7 @@ class MainActivity : ComponentActivity() {
         providerFuture.addListener({
             val provider = providerFuture.get()
 
-            val glView: CameraGLSurfaceView = findViewById(R.id.glView)
+            val glView: AspectRatioGLSurfaceView = findViewById(R.id.glView)
             val renderer = glView.renderer
             val preview = Preview.Builder()
                 .setTargetRotation(Surface.ROTATION_0)
@@ -176,7 +176,7 @@ class MainActivity : ComponentActivity() {
     
     private fun captureScreenAsBitmap(): Bitmap {
         // Capture the entire screen using PixelCopy (Android 8.0+)
-        val glView: CameraGLSurfaceView = findViewById(R.id.glView)
+        val glView: AspectRatioGLSurfaceView = findViewById(R.id.glView)
         val bitmap = Bitmap.createBitmap(glView.width, glView.height, Bitmap.Config.ARGB_8888)
         
         // Use a simple approach - capture the view's current state

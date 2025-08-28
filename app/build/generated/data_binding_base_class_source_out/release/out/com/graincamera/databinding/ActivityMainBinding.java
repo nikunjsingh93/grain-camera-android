@@ -12,8 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
+import com.graincamera.AspectRatioGLSurfaceView;
 import com.graincamera.R;
-import com.graincamera.gl.CameraGLSurfaceView;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -32,7 +32,7 @@ public final class ActivityMainBinding implements ViewBinding {
   public final Spinner filmSpinner;
 
   @NonNull
-  public final CameraGLSurfaceView glView;
+  public final AspectRatioGLSurfaceView glView;
 
   @NonNull
   public final SeekBar grainSeek;
@@ -44,8 +44,9 @@ public final class ActivityMainBinding implements ViewBinding {
   public final Button switchBtn;
 
   private ActivityMainBinding(@NonNull FrameLayout rootView, @NonNull SeekBar bloomSeek,
-      @NonNull Button captureBtn, @NonNull Spinner filmSpinner, @NonNull CameraGLSurfaceView glView,
-      @NonNull SeekBar grainSeek, @NonNull SeekBar halationSeek, @NonNull Button switchBtn) {
+      @NonNull Button captureBtn, @NonNull Spinner filmSpinner,
+      @NonNull AspectRatioGLSurfaceView glView, @NonNull SeekBar grainSeek,
+      @NonNull SeekBar halationSeek, @NonNull Button switchBtn) {
     this.rootView = rootView;
     this.bloomSeek = bloomSeek;
     this.captureBtn = captureBtn;
@@ -102,7 +103,7 @@ public final class ActivityMainBinding implements ViewBinding {
       }
 
       id = R.id.glView;
-      CameraGLSurfaceView glView = ViewBindings.findChildViewById(rootView, id);
+      AspectRatioGLSurfaceView glView = ViewBindings.findChildViewById(rootView, id);
       if (glView == null) {
         break missingId;
       }

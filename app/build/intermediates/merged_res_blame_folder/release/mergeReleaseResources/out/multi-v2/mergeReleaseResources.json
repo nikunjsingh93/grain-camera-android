@@ -133,6 +133,23 @@
                     }
                 },
                 {
+                    "source": "/Users/m4air/Documents/Projects/grain-camera-android/app/src/main/res/values/ic_launcher_background.xml",
+                    "from": {
+                        "startLines": "1",
+                        "startColumns": "4",
+                        "startOffsets": "16",
+                        "endColumns": "56",
+                        "endOffsets": "68"
+                    },
+                    "to": {
+                        "startLines": "632",
+                        "startColumns": "4",
+                        "startOffsets": "33791",
+                        "endColumns": "56",
+                        "endOffsets": "33843"
+                    }
+                },
+                {
                     "source": "/Users/m4air/.gradle/caches/9.0-milestone-1/transforms/95e45002780fd4d373aa4d1b97b8f2bf/transformed/jetified-lifecycle-runtime-release/res/values/values.xml",
                     "from": {
                         "startLines": "2",
@@ -150,7 +167,7 @@
                     }
                 },
                 {
-                    "source": "/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/res/values/strings.xml",
+                    "source": "/Users/m4air/Documents/Projects/grain-camera-android/app/src/main/res/values/strings.xml",
                     "from": {
                         "startLines": "1,6,2,4,7,5,8,3",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -164,6 +181,25 @@
                         "startOffsets": "127778,127978,129618,130667,130720,130760,147487,148510",
                         "endColumns": "49,39,43,52,39,45,42,48",
                         "endOffsets": "127823,128013,129657,130715,130755,130801,147525,148554"
+                    }
+                },
+                {
+                    "source": "/Users/m4air/Documents/Projects/grain-camera-android/app/src/main/res/values/themes.xml",
+                    "from": {
+                        "startLines": "1",
+                        "startColumns": "4",
+                        "startOffsets": "63",
+                        "endLines": "4",
+                        "endColumns": "12",
+                        "endOffsets": "308"
+                    },
+                    "to": {
+                        "startLines": "6330",
+                        "startColumns": "4",
+                        "startOffsets": "444455",
+                        "endLines": "6333",
+                        "endColumns": "12",
+                        "endOffsets": "444700"
                     }
                 },
                 {
@@ -274,42 +310,6 @@
                         "endLines": "26,583,584,585,586,974,975,976,2118,5468,5471,5474,10184",
                         "endColumns": "51,60,61,61,63,58,56,53,12,12,12,12,24",
                         "endOffsets": "1301,30494,30556,30618,30682,58925,58982,59036,152280,386210,386336,386464,673423"
-                    }
-                },
-                {
-                    "source": "/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/res/values/ic_launcher_background.xml",
-                    "from": {
-                        "startLines": "1",
-                        "startColumns": "4",
-                        "startOffsets": "16",
-                        "endColumns": "56",
-                        "endOffsets": "68"
-                    },
-                    "to": {
-                        "startLines": "632",
-                        "startColumns": "4",
-                        "startOffsets": "33791",
-                        "endColumns": "56",
-                        "endOffsets": "33843"
-                    }
-                },
-                {
-                    "source": "/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/res/values/themes.xml",
-                    "from": {
-                        "startLines": "1",
-                        "startColumns": "4",
-                        "startOffsets": "63",
-                        "endLines": "4",
-                        "endColumns": "12",
-                        "endOffsets": "308"
-                    },
-                    "to": {
-                        "startLines": "6330",
-                        "startColumns": "4",
-                        "startOffsets": "444455",
-                        "endLines": "6333",
-                        "endColumns": "12",
-                        "endOffsets": "444700"
                     }
                 },
                 {

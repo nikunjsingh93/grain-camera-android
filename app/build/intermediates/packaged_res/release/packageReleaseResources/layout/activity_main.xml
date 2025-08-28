@@ -4,11 +4,18 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- GLSurfaceView for filtered preview -->
-    <com.graincamera.gl.CameraGLSurfaceView
+    <!-- Background color for areas outside the 4:3 preview -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000" />
+
+    <!-- GLSurfaceView for filtered preview - constrained to 4:3 aspect ratio -->
+    <com.graincamera.AspectRatioGLSurfaceView
         android:id="@+id/glView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_gravity="center" />
 
     <!-- Controls overlay -->
     <LinearLayout

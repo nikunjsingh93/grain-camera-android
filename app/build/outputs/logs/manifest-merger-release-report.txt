@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:1:1-19:12
-INJECTED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:1:1-19:12
-INJECTED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:1:1-19:12
-INJECTED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:1:1-19:12
+ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:1:1-19:12
+INJECTED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:1:1-19:12
+INJECTED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:1:1-19:12
+INJECTED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:1:1-19:12
 MERGED from [androidx.databinding:viewbinding:8.6.0] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/84810cabcf112343babc8e3ee0e55239/transformed/jetified-viewbinding-8.6.0/AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.material:material:1.12.0] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/0f14c19a681d2c3f5fc05ca63d1ce3c9/transformed/material-1.12.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.camera:camera-video:1.3.4] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/fe8182db653a5131e354950a3890272a/transformed/jetified-camera-video-1.3.4/AndroidManifest.xml:2:1-7:12
@@ -56,30 +56,30 @@ MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /Users/
 MERGED from [androidx.print:print:1.0.0] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/c43c14ab6fbffbe6a8ccb666e3d27cf1/transformed/print-1.0.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.arch.core:core-runtime:2.2.0] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/d0b3276e402182ba704070285fe99abb/transformed/core-runtime-2.2.0/AndroidManifest.xml:17:1-22:12
 	package
-		INJECTED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml
 	android:versionName
-		INJECTED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml
 	android:versionCode
-		INJECTED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml
 	xmlns:android
-		ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:1:11-69
+		ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:1:11-69
 uses-permission#android.permission.CAMERA
-ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:2:5-65
+ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:2:5-65
 	android:name
-		ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:2:22-62
+		ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:2:22-62
 uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
-ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:3:5-81
+ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:3:5-81
 	android:name
-		ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:3:22-78
+		ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:3:22-78
 uses-feature#android.hardware.camera
-ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:4:5-85
+ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:4:5-85
 	android:required
-		ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:4:58-82
+		ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:4:58-82
 	android:name
-		ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:4:19-57
+		ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:4:19-57
 application
-ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:5:5-18:19
-INJECTED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:5:5-18:19
+ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:5:5-18:19
+INJECTED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:5:5-18:19
 MERGED from [com.google.android.material:material:1.12.0] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/0f14c19a681d2c3f5fc05ca63d1ce3c9/transformed/material-1.12.0/AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.12.0] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/0f14c19a681d2c3f5fc05ca63d1ce3c9/transformed/material-1.12.0/AndroidManifest.xml:22:5-20
 MERGED from [androidx.camera:camera-camera2:1.3.4] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/a2a7d6339f5445d9b254ed104a2df33a/transformed/jetified-camera-camera2-1.3.4/AndroidManifest.xml:23:5-34:19
@@ -101,37 +101,37 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /Users/m4ai
 MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/baf944c0c58c9f5c8650fada20d228f5/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
 MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/baf944c0c58c9f5c8650fada20d228f5/transformed/jetified-startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
 	android:extractNativeLibs
-		INJECTED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.13.1] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/e74d94c030260e86f28254873e80c103/transformed/core-1.13.1/AndroidManifest.xml:28:18-86
 	android:label
-		ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:8:9-41
+		ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:8:9-41
 	android:icon
-		ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:7:9-43
+		ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:7:9-43
 	android:allowBackup
-		ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:6:9-35
+		ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:6:9-35
 	android:theme
-		ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:9:9-49
+		ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:9:9-49
 activity#com.graincamera.MainActivity
-ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:10:9-17:20
+ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:10:9-17:20
 	android:exported
-		ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:12:13-36
+		ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:12:13-36
 	android:name
-		ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:11:13-41
+		ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:11:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:13:13-16:29
+ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:13:13-16:29
 action#android.intent.action.MAIN
-ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:14:17-69
+ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:14:17-69
 	android:name
-		ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:14:25-66
+		ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:14:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:15:17-77
+ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:15:17-77
 	android:name
-		ADDED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml:15:27-74
+		ADDED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml:15:27-74
 uses-sdk
-INJECTED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
-INJECTED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml
-INJECTED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml
+INJECTED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml
+INJECTED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml
 MERGED from [androidx.databinding:viewbinding:8.6.0] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/84810cabcf112343babc8e3ee0e55239/transformed/jetified-viewbinding-8.6.0/AndroidManifest.xml:5:5-44
 MERGED from [androidx.databinding:viewbinding:8.6.0] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/84810cabcf112343babc8e3ee0e55239/transformed/jetified-viewbinding-8.6.0/AndroidManifest.xml:5:5-44
 MERGED from [com.google.android.material:material:1.12.0] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/0f14c19a681d2c3f5fc05ca63d1ce3c9/transformed/material-1.12.0/AndroidManifest.xml:20:5-44
@@ -235,9 +235,9 @@ MERGED from [androidx.print:print:1.0.0] /Users/m4air/.gradle/caches/9.0-milesto
 MERGED from [androidx.arch.core:core-runtime:2.2.0] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/d0b3276e402182ba704070285fe99abb/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.arch.core:core-runtime:2.2.0] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/d0b3276e402182ba704070285fe99abb/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
 	android:targetSdkVersion
-		INJECTED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml
 	android:minSdkVersion
-		INJECTED from /Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/src/main/AndroidManifest.xml
+		INJECTED from /Users/m4air/Documents/Projects/grain-camera-android/app/src/main/AndroidManifest.xml
 service#androidx.camera.core.impl.MetadataHolderService
 ADDED from [androidx.camera:camera-camera2:1.3.4] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/a2a7d6339f5445d9b254ed104a2df33a/transformed/jetified-camera-camera2-1.3.4/AndroidManifest.xml:24:9-33:19
 MERGED from [androidx.camera:camera-core:1.3.4] /Users/m4air/.gradle/caches/9.0-milestone-1/transforms/e62531a3dd7d5447989bf405b3d11f39/transformed/jetified-camera-core-1.3.4/AndroidManifest.xml:29:9-33:78
