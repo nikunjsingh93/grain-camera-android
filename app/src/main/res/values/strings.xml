@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Grain Camera</string>
+    <string name="capture">Capture</string>
+    <string name="switch_camera">Switch</string>
+    <string name="film_sim">Film Simulation</string>
+    <string name="halation">Halation</string>
+    <string name="bloom">Bloom</string>
+    <string name="grain">Grain</string>
+    <string name="saving">Saving…</string>
+</resources>

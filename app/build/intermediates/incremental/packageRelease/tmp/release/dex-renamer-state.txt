@@ -1,0 +1,7 @@
+#Thu Aug 28 16:56:56 EDT 2025
+base.1=/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build/intermediates/dex/release/mergeDexRelease/classes2.dex
+path.1=classes2.dex
+base.0=/Users/m4air/Documents/Projects/mood-camera-android-toolchain (1)/app/build/intermediates/dex/release/mergeDexRelease/classes.dex
+renamed.1=classes2.dex
+renamed.0=classes.dex
+path.0=classes.dex

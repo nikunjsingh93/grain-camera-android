@@ -1,0 +1,24 @@
+R_DEF: Internal format may change without notice
+local
+color ic_launcher_background
+drawable ic_launcher_foreground
+drawable ic_switch_camera
+id bloomSeek
+id captureBtn
+id filmSpinner
+id glView
+id grainSeek
+id halationSeek
+id switchBtn
+layout activity_main
+mipmap ic_launcher
+mipmap ic_launcher_round
+string app_name
+string bloom
+string capture
+string film_sim
+string grain
+string halation
+string saving
+string switch_camera
+style Theme.GrainCamera

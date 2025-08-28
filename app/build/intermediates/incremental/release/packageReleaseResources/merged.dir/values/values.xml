@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#121212</color>
+    <string name="app_name">Grain Camera</string>
+    <string name="bloom">Bloom</string>
+    <string name="capture">Capture</string>
+    <string name="film_sim">Film Simulation</string>
+    <string name="grain">Grain</string>
+    <string name="halation">Halation</string>
+    <string name="saving">Saving…</string>
+    <string name="switch_camera">Switch</string>
+    <style name="Theme.GrainCamera" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
+</resources>
