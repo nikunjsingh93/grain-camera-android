@@ -31,6 +31,7 @@ import com.graincamera.util.MediaStoreSaver
 import android.view.View
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import kotlin.math.exp
 
 class MainActivity : ComponentActivity() {
     private var cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -263,19 +264,9 @@ class MainActivity : ComponentActivity() {
             canvas.drawBitmap(mutableBitmap, 0f, 0f, bwPaint)
         }
         
-        // Apply additional effects to simulate halation and bloom
+        // Apply realistic halation and bloom effects
         if (params.halation > 0.0f || params.bloom > 0.0f) {
-            val effectPaint = android.graphics.Paint().apply {
-                // Create a blur effect to simulate bloom
-                maskFilter = android.graphics.BlurMaskFilter(
-                    params.bloom * 10f, 
-                    android.graphics.BlurMaskFilter.Blur.NORMAL
-                )
-                alpha = (params.halation * 255).toInt()
-            }
-            
-            // Draw the blurred version on top
-            canvas.drawBitmap(mutableBitmap, 0f, 0f, effectPaint)
+            applyHalationAndBloom(mutableBitmap, params.halation, params.bloom)
         }
         
         // Apply grain effect
@@ -309,6 +300,199 @@ class MainActivity : ComponentActivity() {
         }
         
         bitmap.setPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+    }
+    
+    private fun applyHalationAndBloom(bitmap: Bitmap, halationIntensity: Float, bloomIntensity: Float) {
+        try {
+            // Scale down for performance if image is too large
+            val scaleFactor = if (bitmap.width * bitmap.height > 2000000) 0.5f else 1.0f
+            val workingBitmap = if (scaleFactor < 1.0f) {
+                Bitmap.createScaledBitmap(bitmap, 
+                    (bitmap.width * scaleFactor).toInt(), 
+                    (bitmap.height * scaleFactor).toInt(), true)
+            } else {
+                bitmap.copy(Bitmap.Config.ARGB_8888, true)
+            }
+            
+            val width = workingBitmap.width
+            val height = workingBitmap.height
+            val pixels = IntArray(width * height)
+            workingBitmap.getPixels(pixels, 0, width, 0, 0, width, height)
+            
+            // Create a bright-pass mask for halation and bloom
+            val halationPixels = IntArray(width * height)
+            val bloomPixels = IntArray(width * height)
+            
+            // Calculate brightness and create masks (optimized)
+            for (i in pixels.indices) {
+                val pixel = pixels[i]
+                val r = android.graphics.Color.red(pixel)
+                val g = android.graphics.Color.green(pixel)
+                val b = android.graphics.Color.blue(pixel)
+                
+                // Calculate luminance (same as in shader)
+                val luminance = r * 0.2126f + g * 0.7152f + b * 0.0722f
+                
+                // Bright-pass threshold (similar to shader's smoothstep(0.85, 1.0, Y))
+                val bright = if (luminance > 217) { // 0.85 * 255
+                    (luminance - 217) / (255 - 217) // Normalize to 0-1
+                } else {
+                    0f
+                }.coerceIn(0f, 1f)
+                
+                // Create halation effect: red-biased halo
+                val halationR = (bright * halationIntensity * 255).toInt().coerceIn(0, 255)
+                val halationG = (bright * halationIntensity * 255 * 0.3f).toInt().coerceIn(0, 255)
+                val halationB = (bright * halationIntensity * 255 * 0.2f).toInt().coerceIn(0, 255)
+                halationPixels[i] = android.graphics.Color.rgb(halationR, halationG, halationB)
+                
+                // Create bloom effect: white glow
+                val bloomValue = (bright * bloomIntensity * 255).toInt().coerceIn(0, 255)
+                bloomPixels[i] = android.graphics.Color.rgb(bloomValue, bloomValue, bloomValue)
+            }
+            
+            // Apply optimized blur to halation and bloom
+            val blurredHalation = applyFastBlur(halationPixels, width, height, (4f + 8f * halationIntensity).toInt())
+            val blurredBloom = applyFastBlur(bloomPixels, width, height, (2f + 4f * bloomIntensity).toInt())
+            
+            // Combine effects with original image
+            for (i in pixels.indices) {
+                val originalPixel = pixels[i]
+                val halationPixel = blurredHalation[i]
+                val bloomPixel = blurredBloom[i]
+                
+                val originalR = android.graphics.Color.red(originalPixel)
+                val originalG = android.graphics.Color.green(originalPixel)
+                val originalB = android.graphics.Color.blue(originalPixel)
+                
+                val halationR = android.graphics.Color.red(halationPixel)
+                val halationG = android.graphics.Color.green(halationPixel)
+                val halationB = android.graphics.Color.blue(halationPixel)
+                
+                val bloomR = android.graphics.Color.red(bloomPixel)
+                val bloomG = android.graphics.Color.green(bloomPixel)
+                val bloomB = android.graphics.Color.blue(bloomPixel)
+                
+                // Add halation and bloom to original
+                val finalR = (originalR + halationR + bloomR).coerceIn(0, 255)
+                val finalG = (originalG + halationG + bloomG).coerceIn(0, 255)
+                val finalB = (originalB + halationB + bloomB).coerceIn(0, 255)
+                
+                pixels[i] = android.graphics.Color.rgb(finalR, finalG, finalB)
+            }
+            
+            workingBitmap.setPixels(pixels, 0, width, 0, 0, width, height)
+            
+            // Scale back up if needed
+            if (scaleFactor < 1.0f) {
+                val finalBitmap = Bitmap.createScaledBitmap(workingBitmap, bitmap.width, bitmap.height, true)
+                workingBitmap.recycle()
+                val finalPixels = IntArray(bitmap.width * bitmap.height)
+                finalBitmap.getPixels(finalPixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+                bitmap.setPixels(finalPixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+                finalBitmap.recycle()
+            } else {
+                bitmap.setPixels(pixels, 0, width, 0, 0, width, height)
+            }
+            
+        } catch (e: Exception) {
+            // Fallback to simple effect if processing fails
+            android.util.Log.w("MainActivity", "Halation processing failed: ${e.message}")
+            applySimpleHalation(bitmap, halationIntensity, bloomIntensity)
+        }
+    }
+    
+    private fun applyFastBlur(pixels: IntArray, width: Int, height: Int, radius: Int): IntArray {
+        if (radius <= 0) return pixels
+        
+        val result = IntArray(pixels.size)
+        val kernelSize = radius * 2 + 1
+        
+        // Apply horizontal blur
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                var r = 0
+                var g = 0
+                var b = 0
+                var count = 0
+                
+                for (i in -radius..radius) {
+                    val sampleX = (x + i).coerceIn(0, width - 1)
+                    val pixel = pixels[y * width + sampleX]
+                    r += android.graphics.Color.red(pixel)
+                    g += android.graphics.Color.green(pixel)
+                    b += android.graphics.Color.blue(pixel)
+                    count++
+                }
+                
+                result[y * width + x] = android.graphics.Color.rgb(
+                    r / count,
+                    g / count,
+                    b / count
+                )
+            }
+        }
+        
+        // Apply vertical blur
+        val finalResult = IntArray(pixels.size)
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                var r = 0
+                var g = 0
+                var b = 0
+                var count = 0
+                
+                for (i in -radius..radius) {
+                    val sampleY = (y + i).coerceIn(0, height - 1)
+                    val pixel = result[sampleY * width + x]
+                    r += android.graphics.Color.red(pixel)
+                    g += android.graphics.Color.green(pixel)
+                    b += android.graphics.Color.blue(pixel)
+                    count++
+                }
+                
+                finalResult[y * width + x] = android.graphics.Color.rgb(
+                    r / count,
+                    g / count,
+                    b / count
+                )
+            }
+        }
+        
+        return finalResult
+    }
+    
+    private fun applySimpleHalation(bitmap: Bitmap, halationIntensity: Float, bloomIntensity: Float) {
+        val canvas = android.graphics.Canvas(bitmap)
+        
+        // Simple blur effect for halation
+        if (halationIntensity > 0.0f) {
+            val halationPaint = android.graphics.Paint().apply {
+                maskFilter = android.graphics.BlurMaskFilter(
+                    halationIntensity * 15f, 
+                    android.graphics.BlurMaskFilter.Blur.NORMAL
+                )
+                colorFilter = android.graphics.ColorMatrixColorFilter(
+                    android.graphics.ColorMatrix().apply {
+                        setScale(1.2f, 0.8f, 0.7f, 1.0f) // Red bias
+                    }
+                )
+                alpha = (halationIntensity * 128).toInt()
+            }
+            canvas.drawBitmap(bitmap, 0f, 0f, halationPaint)
+        }
+        
+        // Simple blur effect for bloom
+        if (bloomIntensity > 0.0f) {
+            val bloomPaint = android.graphics.Paint().apply {
+                maskFilter = android.graphics.BlurMaskFilter(
+                    bloomIntensity * 10f, 
+                    android.graphics.BlurMaskFilter.Blur.NORMAL
+                )
+                alpha = (bloomIntensity * 100).toInt()
+            }
+            canvas.drawBitmap(bitmap, 0f, 0f, bloomPaint)
+        }
     }
     
 
