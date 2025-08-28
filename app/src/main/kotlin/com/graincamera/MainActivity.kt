@@ -231,39 +231,49 @@ class MainActivity : ComponentActivity() {
     }
     
     private fun applyFilterToBitmap(bitmap: Bitmap, renderer: com.graincamera.gl.GLRenderer): Bitmap {
-        val params = renderer.params
-        val film = params.film
-        
-        // Create a mutable copy of the bitmap
-        val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-        val canvas = android.graphics.Canvas(mutableBitmap)
-        
-        // Apply film simulation effects
-        val paint = android.graphics.Paint().apply {
-            // Apply contrast
-            colorFilter = android.graphics.ColorMatrixColorFilter(
-                android.graphics.ColorMatrix().apply {
-                    setSaturation(film.saturation)
-                }
-            )
-        }
-        
-        // Apply the paint to the canvas
-        canvas.drawBitmap(bitmap, 0f, 0f, paint)
-        
-        // For Acros B&W, apply additional black and white conversion
-        if (film.saturation == 0.0f) {
-            val bwPaint = android.graphics.Paint().apply {
+        try {
+            // Try to capture the actual rendered frame from OpenGL
+            android.util.Log.d("MainActivity", "Attempting OpenGL capture for filtered image")
+            val filteredBitmap = renderer.captureCurrentFrame()
+            android.util.Log.d("MainActivity", "OpenGL capture successful: ${filteredBitmap.width}x${filteredBitmap.height}")
+            return filteredBitmap
+        } catch (e: Exception) {
+            // Fallback to basic filter application if OpenGL capture fails
+            android.util.Log.w("MainActivity", "OpenGL capture failed, using fallback: ${e.message}")
+            val params = renderer.params
+            val film = params.film
+            
+            // Create a mutable copy of the bitmap
+            val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+            val canvas = android.graphics.Canvas(mutableBitmap)
+            
+            // Apply film simulation effects
+            val paint = android.graphics.Paint().apply {
+                // Apply contrast
                 colorFilter = android.graphics.ColorMatrixColorFilter(
                     android.graphics.ColorMatrix().apply {
-                        setSaturation(0f) // Make it black and white
+                        setSaturation(film.saturation)
                     }
                 )
             }
-            canvas.drawBitmap(mutableBitmap, 0f, 0f, bwPaint)
+            
+            // Apply the paint to the canvas
+            canvas.drawBitmap(bitmap, 0f, 0f, paint)
+            
+            // For Acros B&W, apply additional black and white conversion
+            if (film.saturation == 0.0f) {
+                val bwPaint = android.graphics.Paint().apply {
+                    colorFilter = android.graphics.ColorMatrixColorFilter(
+                        android.graphics.ColorMatrix().apply {
+                            setSaturation(0f) // Make it black and white
+                        }
+                    )
+                }
+                canvas.drawBitmap(mutableBitmap, 0f, 0f, bwPaint)
+            }
+            
+            return mutableBitmap
         }
-        
-        return mutableBitmap
     }
     
 
