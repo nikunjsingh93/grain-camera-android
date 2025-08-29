@@ -2,6 +2,7 @@ package com.graincamera
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageButton
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.SeekBar
@@ -47,6 +48,16 @@ class FilmSelectionActivity : ComponentActivity() {
                 updateSettingsForFilm(selectedFilm.name)
             }
         })
+
+        // Prev/Next buttons
+        findViewById<ImageButton>(R.id.btnPrevFilm)?.setOnClickListener {
+            val prev = (currentPosition - 1 + FilmSim.values().size) % FilmSim.values().size
+            viewPager.setCurrentItem(prev, true)
+        }
+        findViewById<ImageButton>(R.id.btnNextFilm)?.setOnClickListener {
+            val next = (currentPosition + 1) % FilmSim.values().size
+            viewPager.setCurrentItem(next, true)
+        }
 
         fun onSeekChanged() {
             val film = FilmSim.values()[currentPosition]
