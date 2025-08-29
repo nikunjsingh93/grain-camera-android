@@ -100,8 +100,19 @@ class MainActivity : ComponentActivity() {
         val renderer = glView.renderer
 
         findViewById<View>(R.id.captureCircle).setOnClickListener { takePhoto() }
-        findViewById<Button>(R.id.filmBtn).setOnClickListener {
+        findViewById<ImageButton>(R.id.filmBtn).setOnClickListener {
             startActivity(Intent(this, FilmSelectionActivity::class.java))
+        }
+
+        findViewById<ImageButton>(R.id.ruleOfThirdsBtn).setOnClickListener {
+            val glView: AspectRatioGLSurfaceView = findViewById(R.id.glView)
+            val renderer = glView.renderer
+            val currentParams = renderer.params
+            val newShowRuleOfThirds = !currentParams.showRuleOfThirds
+            renderer.params = currentParams.copy(showRuleOfThirds = newShowRuleOfThirds)
+            
+            // Update button state
+            findViewById<ImageButton>(R.id.ruleOfThirdsBtn).isSelected = newShowRuleOfThirds
         }
 
         findViewById<View>(R.id.switchBtn).setOnClickListener {
@@ -112,6 +123,9 @@ class MainActivity : ComponentActivity() {
 
         // Update film name display
         updateFilmNameDisplay()
+        
+        // Initialize rule of thirds button state
+        findViewById<ImageButton>(R.id.ruleOfThirdsBtn).isSelected = renderer.params.showRuleOfThirds
     }
 
     private fun startCamera() {

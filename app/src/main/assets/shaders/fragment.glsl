@@ -8,6 +8,7 @@ uniform float uTime;
 uniform vec4 uParams;
 // x=contrast, y=saturation, z=shadowTint, w=highlightTint
 uniform vec4 uFilm;
+uniform int uShowRuleOfThirds;
 
 varying vec2 vTexCoord;
 
@@ -84,6 +85,25 @@ void main() {
     // Grain
     float g = (rand(vTexCoord * uResolution + uTime*60.0) - 0.5) * uParams.z * 0.25;
     c += g;
+
+    // Rule of thirds overlay
+    if (uShowRuleOfThirds == 1) {
+        vec2 uv = vTexCoord;
+        float lineWidth = 1.0 / uResolution.x * 2.0; // 2 pixel wide lines
+        
+        // Vertical lines at 1/3 and 2/3
+        float v1 = abs(uv.x - 0.333333);
+        float v2 = abs(uv.x - 0.666667);
+        
+        // Horizontal lines at 1/3 and 2/3
+        float h1 = abs(uv.y - 0.333333);
+        float h2 = abs(uv.y - 0.666667);
+        
+        // Check if we're on any of the rule of thirds lines
+        if (v1 < lineWidth || v2 < lineWidth || h1 < lineWidth || h2 < lineWidth) {
+            c = mix(c, vec3(1.0, 1.0, 1.0), 0.3); // White overlay with 30% opacity
+        }
+    }
 
     gl_FragColor = vec4(clamp(c, 0.0, 1.0), 1.0);
 }

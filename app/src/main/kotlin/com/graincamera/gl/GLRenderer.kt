@@ -25,6 +25,7 @@ class GLRenderer(private val context: Context) : GLSurfaceView.Renderer, Surface
     private var uTime = 0
     private var uParams = 0
     private var uFilm = 0
+    private var uShowRuleOfThirds = 0
 
     private val stMatrix = FloatArray(16)
     private val quad: FloatBuffer = ByteBuffer.allocateDirect(4 * 4 * 2).order(ByteOrder.nativeOrder()).asFloatBuffer().apply {
@@ -66,6 +67,7 @@ class GLRenderer(private val context: Context) : GLSurfaceView.Renderer, Surface
         uTime = GLES20.glGetUniformLocation(program, "uTime")
         uParams = GLES20.glGetUniformLocation(program, "uParams")
         uFilm = GLES20.glGetUniformLocation(program, "uFilm")
+        uShowRuleOfThirds = GLES20.glGetUniformLocation(program, "uShowRuleOfThirds")
 
         // Create external OES texture
         val texs = IntArray(1)
@@ -113,6 +115,7 @@ class GLRenderer(private val context: Context) : GLSurfaceView.Renderer, Surface
         val p = params
         GLES20.glUniform4f(uParams, p.halation, p.bloom, p.grain, p.exposure)
         GLES20.glUniform4f(uFilm, p.film.contrast, p.film.saturation, p.film.shadowTint, p.film.highlightTint)
+        GLES20.glUniform1i(uShowRuleOfThirds, if (p.showRuleOfThirds) 1 else 0)
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureOES)
@@ -233,6 +236,7 @@ class GLRenderer(private val context: Context) : GLSurfaceView.Renderer, Surface
         val p = params
         GLES20.glUniform4f(uParams, p.halation, p.bloom, p.grain, p.exposure)
         GLES20.glUniform4f(uFilm, p.film.contrast, p.film.saturation, p.film.shadowTint, p.film.highlightTint)
+        GLES20.glUniform1i(uShowRuleOfThirds, if (p.showRuleOfThirds) 1 else 0)
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureOES)
@@ -311,6 +315,7 @@ class GLRenderer(private val context: Context) : GLSurfaceView.Renderer, Surface
         val p = params
         GLES20.glUniform4f(uParams, p.halation, p.bloom, p.grain, p.exposure)
         GLES20.glUniform4f(uFilm, p.film.contrast, p.film.saturation, p.film.shadowTint, p.film.highlightTint)
+        GLES20.glUniform1i(uShowRuleOfThirds, if (p.showRuleOfThirds) 1 else 0)
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureOES)
@@ -368,7 +373,8 @@ data class EffectParams(
     val bloom: Float = 0.3f,
     val grain: Float = 0.15f,
     val exposure: Float = 0.0f,
-    val film: Film = FilmSim.PROVIA.film
+    val film: Film = FilmSim.PROVIA.film,
+    val showRuleOfThirds: Boolean = false
 )
 
 enum class FilmSim(val displayName: String, val film: Film) {

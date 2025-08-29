@@ -28,6 +28,16 @@
         android:padding="16dp"
         android:background="#000000">
 
+        <!-- Rule of thirds button -->
+        <ImageButton
+            android:id="@+id/ruleOfThirdsBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/rule_of_thirds_selector"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Toggle Rule of Thirds"
+            android:layout_marginBottom="8dp"/>
+
         <!-- Film name display -->
         <TextView
             android:id="@+id/currentFilmName"
@@ -53,11 +63,13 @@
                 android:layout_weight="1"
                 android:gravity="center">
 
-                <Button
+                <ImageButton
                     android:id="@+id/filmBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="FILM"/>
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_film"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Film Selection"/>
             </LinearLayout>
 
             <!-- Center - Capture button -->
