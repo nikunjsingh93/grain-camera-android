@@ -12,38 +12,65 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top"/>
 
-    <!-- Camera controls positioned at the bottom of the preview area -->
+    <!-- Spacer to push controls to center of remaining space -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="96dp"
-        android:orientation="horizontal"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"/>
+
+    <!-- Camera controls positioned at center of remaining space -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:gravity="center"
         android:padding="16dp"
         android:background="#000000">
 
-        <Button
-            android:id="@+id/filmBtn"
-            android:layout_width="0dp"
+        <!-- Film name display -->
+        <TextView
+            android:id="@+id/currentFilmName"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="FILM"/>
+            android:text="PROVIA"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:layout_marginBottom="16dp"/>
 
-        <View
-            android:id="@+id/captureCircle"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/capture_button"
-            android:clickable="true"
-            android:focusable="true"/>
-
-        <Button
-            android:id="@+id/switchBtn"
-            android:layout_width="0dp"
+        <!-- Camera controls row -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Switch"/>
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/filmBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="FILM"/>
+
+            <View
+                android:id="@+id/captureCircle"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/capture_button"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <View
+                android:id="@+id/switchBtn"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@drawable/switch_camera_icon"
+                android:clickable="true"
+                android:focusable="true"/>
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Spacer to push controls to bottom of screen -->

@@ -92,6 +92,8 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         // Always re-apply film and settings on resume
         startCamera()
+        // Update film name display
+        updateFilmNameDisplay()
     }
 
     private fun setupUI(glView: AspectRatioGLSurfaceView) {
@@ -102,13 +104,14 @@ class MainActivity : ComponentActivity() {
             startActivity(Intent(this, FilmSelectionActivity::class.java))
         }
 
-        findViewById<Button>(R.id.switchBtn).setOnClickListener {
+        findViewById<View>(R.id.switchBtn).setOnClickListener {
             cameraSelector = if (cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA)
                 CameraSelector.DEFAULT_FRONT_CAMERA else CameraSelector.DEFAULT_BACK_CAMERA
             startCamera()
         }
 
-        // capture handled by captureCircle view
+        // Update film name display
+        updateFilmNameDisplay()
     }
 
     private fun startCamera() {
@@ -635,6 +638,11 @@ class MainActivity : ComponentActivity() {
         return bitmap
     }
     
+    private fun updateFilmNameDisplay() {
+        val currentFilmName = FilmSettingsStore.getSelectedFilm(this)
+        val film = com.graincamera.gl.FilmSim.values().firstOrNull { it.name == currentFilmName }
+        findViewById<TextView>(R.id.currentFilmName).text = film?.displayName ?: "PROVIA"
+    }
 
 }
 
