@@ -13,6 +13,8 @@ uniform int uShowRuleOfThirds;
 uniform float uGrainSize;
 // Grain roughness (0..1) controls higher-frequency contribution
 uniform float uGrainRoughness;
+// Temperature: -1 cool, +1 warm
+uniform float uTemperature;
 
 varying vec2 vTexCoord;
 
@@ -85,6 +87,10 @@ void main() {
 
     vec3 c = base;
     c = toneMap(c, contrast, uParams.w);
+    // White balance temperature (subtle gain on R/B)
+    float temp = clamp(uTemperature, -1.0, 1.0);
+    vec3 wb = vec3(1.0 + 0.15 * temp, 1.0, 1.0 - 0.15 * temp);
+    c *= wb;
     c = sat(c, saturation);
 
     float Y = luma(c);

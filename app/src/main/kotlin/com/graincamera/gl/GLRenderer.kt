@@ -28,6 +28,7 @@ class GLRenderer(private val context: Context) : GLSurfaceView.Renderer, Surface
     private var uShowRuleOfThirds = 0
     private var uGrainSizeLoc = 0
     private var uGrainRoughnessLoc = 0
+    private var uTemperatureLoc = 0
 
     private val stMatrix = FloatArray(16)
     private val quad: FloatBuffer = ByteBuffer.allocateDirect(4 * 4 * 2).order(ByteOrder.nativeOrder()).asFloatBuffer().apply {
@@ -72,6 +73,7 @@ class GLRenderer(private val context: Context) : GLSurfaceView.Renderer, Surface
         uShowRuleOfThirds = GLES20.glGetUniformLocation(program, "uShowRuleOfThirds")
         uGrainSizeLoc = GLES20.glGetUniformLocation(program, "uGrainSize")
         uGrainRoughnessLoc = GLES20.glGetUniformLocation(program, "uGrainRoughness")
+        uTemperatureLoc = GLES20.glGetUniformLocation(program, "uTemperature")
 
         // Create external OES texture
         val texs = IntArray(1)
@@ -120,6 +122,7 @@ class GLRenderer(private val context: Context) : GLSurfaceView.Renderer, Surface
         GLES20.glUniform4f(uParams, p.halation, p.bloom, 0f, p.exposure) // disable grain in preview
         GLES20.glUniform1f(uGrainSizeLoc, max(1f, min(2f, p.grainSize)))
         GLES20.glUniform1f(uGrainRoughnessLoc, p.grainRoughness)
+        GLES20.glUniform1f(uTemperatureLoc, p.temperature)
         GLES20.glUniform4f(uFilm, p.film.contrast, p.film.saturation, p.film.shadowTint, p.film.highlightTint)
         GLES20.glUniform1i(uShowRuleOfThirds, if (p.showRuleOfThirds) 1 else 0)
 
@@ -243,6 +246,7 @@ class GLRenderer(private val context: Context) : GLSurfaceView.Renderer, Surface
         GLES20.glUniform4f(uParams, p.halation, p.bloom, 0f, p.exposure) // disable grain in preview
         GLES20.glUniform1f(uGrainSizeLoc, max(1f, min(2f, p.grainSize)))
         GLES20.glUniform1f(uGrainRoughnessLoc, p.grainRoughness)
+        GLES20.glUniform1f(uTemperatureLoc, p.temperature)
         GLES20.glUniform4f(uFilm, p.film.contrast, p.film.saturation, p.film.shadowTint, p.film.highlightTint)
         GLES20.glUniform1i(uShowRuleOfThirds, if (p.showRuleOfThirds) 1 else 0)
 
@@ -324,6 +328,7 @@ class GLRenderer(private val context: Context) : GLSurfaceView.Renderer, Surface
         GLES20.glUniform4f(uParams, p.halation, p.bloom, 0f, p.exposure) // disable grain in preview
         GLES20.glUniform1f(uGrainSizeLoc, max(1f, min(2f, p.grainSize)))
         GLES20.glUniform1f(uGrainRoughnessLoc, p.grainRoughness)
+        GLES20.glUniform1f(uTemperatureLoc, p.temperature)
         GLES20.glUniform4f(uFilm, p.film.contrast, p.film.saturation, p.film.shadowTint, p.film.highlightTint)
         GLES20.glUniform1i(uShowRuleOfThirds, if (p.showRuleOfThirds) 1 else 0)
 
@@ -384,6 +389,7 @@ data class EffectParams(
     val grain: Float = 0.15f,
     val grainSize: Float = 1.5f,
     val grainRoughness: Float = 0.5f,
+    val temperature: Float = 0.0f,
     val exposure: Float = 0.0f,
     val film: Film = FilmSim.PROVIA.film,
     val showRuleOfThirds: Boolean = false

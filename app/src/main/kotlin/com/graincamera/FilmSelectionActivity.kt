@@ -68,6 +68,8 @@ class FilmSelectionActivity : ComponentActivity() {
             val grainRoughness = findViewById<SeekBar>(R.id.seekGrainRoughness).progress / 100f
             val exposure = (findViewById<SeekBar>(R.id.seekExposure).progress / 100f) * 2f - 1f // -1..+1 stops
             val contrast = 0.5f + (findViewById<SeekBar>(R.id.seekContrast).progress / 100f) // 0.5..1.5
+            val saturationAdj = 1.2f * (findViewById<SeekBar>(R.id.seekSaturation).progress / 100f) // 0..1.2
+            val temperature = (findViewById<SeekBar>(R.id.seekTemperature).progress / 100f) * 2f - 1f // -1..+1
 
             findViewById<TextView>(R.id.valueHalation).text = String.format(Locale.US, "%.0f", halation * 100f)
             findViewById<TextView>(R.id.valueBloom).text = String.format(Locale.US, "%.0f", bloom * 100f)
@@ -76,8 +78,10 @@ class FilmSelectionActivity : ComponentActivity() {
             findViewById<TextView>(R.id.valueGrainRoughness).text = String.format(Locale.US, "%.0f", grainRoughness * 100f)
             findViewById<TextView>(R.id.valueExposure).text = String.format(Locale.US, "%.1f stops", exposure)
             findViewById<TextView>(R.id.valueContrast).text = String.format(Locale.US, "%.0f%%", contrast * 100f)
+            findViewById<TextView>(R.id.valueSaturation).text = String.format(Locale.US, "%.0f%%", saturationAdj * 100f)
+            findViewById<TextView>(R.id.valueTemperature).text = String.format(Locale.US, "%.0f", temperature * 100f)
 
-            FilmSettingsStore.saveSettingsForFilm(this, film.name, halation, bloom, grain, grainSize, grainRoughness, exposure, contrast)
+            FilmSettingsStore.saveSettingsForFilm(this, film.name, halation, bloom, grain, grainSize, grainRoughness, exposure, contrast, saturationAdj, temperature)
         }
 
         findViewById<SeekBar>(R.id.seekHalation).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
@@ -87,6 +91,8 @@ class FilmSelectionActivity : ComponentActivity() {
         findViewById<SeekBar>(R.id.seekGrainRoughness).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
         findViewById<SeekBar>(R.id.seekExposure).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
         findViewById<SeekBar>(R.id.seekContrast).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
+        findViewById<SeekBar>(R.id.seekSaturation).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
+        findViewById<SeekBar>(R.id.seekTemperature).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
 
         // Initialize with current film settings
         updateSettingsForFilm(currentFilm)
@@ -109,6 +115,8 @@ class FilmSelectionActivity : ComponentActivity() {
         findViewById<SeekBar>(R.id.seekGrainRoughness).progress = (settings.grainRoughness * 100).toInt()
         findViewById<SeekBar>(R.id.seekExposure).progress = (((settings.exposure + 1f) / 2f) * 100f).toInt().coerceIn(0, 100)
         findViewById<SeekBar>(R.id.seekContrast).progress = (((settings.contrast - 0.5f) / 1f) * 100f).toInt().coerceIn(0, 100)
+        findViewById<SeekBar>(R.id.seekSaturation).progress = ((settings.saturationAdj / 1.2f) * 100).toInt().coerceIn(0, 100)
+        findViewById<SeekBar>(R.id.seekTemperature).progress = (((settings.temperature + 1f) / 2f) * 100f).toInt().coerceIn(0, 100)
 
         findViewById<TextView>(R.id.valueHalation).text = String.format(Locale.US, "%.0f", settings.halation * 100f)
         findViewById<TextView>(R.id.valueBloom).text = String.format(Locale.US, "%.0f", settings.bloom * 100f)
@@ -117,6 +125,8 @@ class FilmSelectionActivity : ComponentActivity() {
         findViewById<TextView>(R.id.valueGrainRoughness).text = String.format(Locale.US, "%.0f", settings.grainRoughness * 100f)
         findViewById<TextView>(R.id.valueExposure).text = String.format(Locale.US, "%.1f stops", settings.exposure)
         findViewById<TextView>(R.id.valueContrast).text = String.format(Locale.US, "%.0f%%", settings.contrast * 100f)
+        findViewById<TextView>(R.id.valueSaturation).text = String.format(Locale.US, "%.0f%%", settings.saturationAdj * 100f)
+        findViewById<TextView>(R.id.valueTemperature).text = String.format(Locale.US, "%.0f", settings.temperature * 100f)
     }
 }
 
@@ -182,7 +192,7 @@ object FilmSettingsStore {
     private const val KEY_SELECTED = "selected_film"
     private const val KEY_RULE_OF_THIRDS = "rule_of_thirds"
     private fun key(film: String) = "film_settings_" + film
-    data class Settings(val halation: Float, val bloom: Float, val grain: Float, val grainSize: Float, val grainRoughness: Float, val exposure: Float, val contrast: Float)
+    data class Settings(val halation: Float, val bloom: Float, val grain: Float, val grainSize: Float, val grainRoughness: Float, val exposure: Float, val contrast: Float, val saturationAdj: Float, val temperature: Float)
     fun getSelectedFilm(ctx: android.content.Context): String {
         val d = android.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
         return d.getString(KEY_SELECTED, com.graincamera.gl.FilmSim.PROVIA.name) ?: com.graincamera.gl.FilmSim.PROVIA.name
@@ -201,9 +211,11 @@ object FilmSettingsStore {
         val gr = d.getFloat(k + "_gr", 0.5f)
         val ex = d.getFloat(k + "_ex", 0f).coerceIn(-1f, 1f)
         val ct = d.getFloat(k + "_ct", 1.0f).coerceIn(0.5f, 1.5f)
-        return Settings(h, b, g, gs, gr, ex, ct)
+        val sa = d.getFloat(k + "_sa", 1.0f).coerceIn(0f, 2f)
+        val tp = d.getFloat(k + "_tp", 0.0f).coerceIn(-1f, 1f)
+        return Settings(h, b, g, gs, gr, ex, ct, sa, tp)
     }
-    fun saveSettingsForFilm(ctx: android.content.Context, film: String, h: Float, b: Float, g: Float, gs: Float, gr: Float, ex: Float, ct: Float) {
+    fun saveSettingsForFilm(ctx: android.content.Context, film: String, h: Float, b: Float, g: Float, gs: Float, gr: Float, ex: Float, ct: Float, sa: Float, tp: Float) {
         val d = android.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
         val k = key(film)
         d.edit()
@@ -214,6 +226,8 @@ object FilmSettingsStore {
             .putFloat(k + "_gr", gr)
             .putFloat(k + "_ex", ex.coerceIn(-1f, 1f))
             .putFloat(k + "_ct", ct.coerceIn(0.5f, 1.5f))
+            .putFloat(k + "_sa", sa.coerceIn(0f, 2f))
+            .putFloat(k + "_tp", tp.coerceIn(-1f, 1f))
             .apply()
     }
 

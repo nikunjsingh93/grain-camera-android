@@ -253,6 +253,60 @@
                 android:thumb="@drawable/seekbar_thumb_big"
                 android:minHeight="40dp"
                 android:thumbOffset="10dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="6dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Saturation"
+                    android:textColor="#FFFFFF"/>
+                <TextView
+                    android:id="@+id/valueSaturation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:text="100%"/>
+            </LinearLayout>
+            <SeekBar
+                android:id="@+id/seekSaturation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:thumb="@drawable/seekbar_thumb_big"
+                android:minHeight="40dp"
+                android:thumbOffset="10dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="6dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Temperature"
+                    android:textColor="#FFFFFF"/>
+                <TextView
+                    android:id="@+id/valueTemperature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:text="0"/>
+            </LinearLayout>
+            <SeekBar
+                android:id="@+id/seekTemperature"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:thumb="@drawable/seekbar_thumb_big"
+                android:minHeight="40dp"
+                android:thumbOffset="10dp"/>
             
 
             <Button

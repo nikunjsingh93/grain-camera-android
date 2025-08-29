@@ -74,6 +74,7 @@ class PhotoProcessingWorker(
             val filmName = inputData.getString("filmName") ?: "PROVIA"
             val exposure = inputData.getFloat("exposure", 0f)
             val contrast = inputData.getFloat("contrast", 1.0f)
+            val temperature = inputData.getFloat("temperature", 0.0f)
             
             // Create params object
             val filmBase = FilmSim.values().find { it.name == filmName }?.film ?: FilmSim.PROVIA.film
@@ -84,6 +85,7 @@ class PhotoProcessingWorker(
                 grain = grain,
                 grainSize = grainSize,
                 grainRoughness = grainRoughness,
+                temperature = temperature,
                 exposure = exposure
             )
             
@@ -183,6 +185,7 @@ class PhotoProcessingWorker(
         val exposureMul = Math.pow(2.0, params.exposure.toDouble()).toFloat()
         val contrast = params.film.contrast
         val saturation = params.film.saturation
+        val temperature = params.temperature
         val shadowTint = params.film.shadowTint
         val highlightTint = params.film.highlightTint
 
@@ -220,6 +223,12 @@ class PhotoProcessingWorker(
             r = clamp01(((r * exposureMul) - 0.5f) * contrast + 0.5f)
             g = clamp01(((g * exposureMul) - 0.5f) * contrast + 0.5f)
             b = clamp01(((b * exposureMul) - 0.5f) * contrast + 0.5f)
+
+            // Temperature (white balance)
+            val wbR = 1f + 0.15f * temperature
+            val wbB = 1f - 0.15f * temperature
+            r *= wbR
+            b *= wbB
 
             // Saturation via luma mix
             val Y = luma(r, g, b)

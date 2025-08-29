@@ -215,8 +215,9 @@ class MainActivity : ComponentActivity() {
                     grain = s.grain,
                     grainSize = s.grainSize,
                     grainRoughness = s.grainRoughness,
+                    temperature = s.temperature,
                     exposure = s.exposure,
-                    film = renderer.params.film.copy(contrast = s.contrast, saturation = renderer.params.film.saturation)
+                    film = renderer.params.film.copy(contrast = s.contrast, saturation = s.saturationAdj)
                 )
             }
             val preview = Preview.Builder()
@@ -499,6 +500,7 @@ class MainActivity : ComponentActivity() {
                 .putFloat("grainSize", params.grainSize)
                 .putFloat("grainRoughness", params.grainRoughness)
                 .putFloat("saturation", params.film.saturation)
+                .putFloat("temperature", params.temperature)
                 .putFloat("exposure", params.exposure)
                 .putFloat("contrast", params.film.contrast)
                 .putString("filmName", com.graincamera.gl.FilmSim.values().firstOrNull { it.film == params.film }?.name
