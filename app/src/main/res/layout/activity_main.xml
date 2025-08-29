@@ -39,39 +39,52 @@
             android:layout_marginBottom="16dp"/>
 
         <!-- Camera controls row -->
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:padding="16dp">
 
-            <!-- Film button on the left -->
-            <Button
-                android:id="@+id/filmBtn"
-                android:layout_width="wrap_content"
+            <!-- Left side - Film button -->
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|start"
-                android:text="FILM"/>
+                android:layout_weight="1"
+                android:gravity="center">
 
-            <!-- Capture button in center -->
+                <Button
+                    android:id="@+id/filmBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FILM"/>
+            </LinearLayout>
+
+            <!-- Center - Capture button -->
             <View
                 android:id="@+id/captureCircle"
                 android:layout_width="72dp"
                 android:layout_height="72dp"
-                android:layout_gravity="center"
                 android:background="@drawable/capture_button"
                 android:clickable="true"
                 android:focusable="true"/>
 
-            <!-- Switch button on the right -->
-            <View
-                android:id="@+id/switchBtn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center_vertical|end"
-                android:background="@drawable/switch_camera_icon"
-                android:clickable="true"
-                android:focusable="true"/>
-        </FrameLayout>
+            <!-- Right side - Switch button -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <View
+                    android:id="@+id/switchBtn"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/switch_camera_icon"
+                    android:clickable="true"
+                    android:focusable="true"/>
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Spacer to push controls to bottom of screen -->
