@@ -2,7 +2,7 @@ package com.graincamera
 
 import android.content.Context
 import android.util.AttributeSet
- 
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.graincamera.gl.CameraGLSurfaceView
@@ -32,7 +32,16 @@ class AspectRatioGLSurfaceView @JvmOverloads constructor(
     
     
 
-    fun setCameraTouchListener(listener: OnTouchListener) { /* removed: no-op */ }
+    fun setCameraTouchListener(listener: OnTouchListener) {
+        // Ensure the inner GLSurfaceView is touchable and forwards events
+        glSurfaceView.isClickable = true
+        glSurfaceView.isFocusable = true
+        glSurfaceView.isFocusableInTouchMode = true
+        glSurfaceView.setOnTouchListener(listener)
+        // Also set on container in case it intercepts
+        this.isClickable = true
+        this.setOnTouchListener(listener)
+    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = MeasureSpec.getSize(widthMeasureSpec)

@@ -40,6 +40,10 @@ import android.content.Intent
 import android.content.Context
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import android.view.MotionEvent
+import androidx.camera.core.FocusMeteringAction
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory
+import java.util.concurrent.TimeUnit
 import androidx.work.WorkManager
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkRequest
@@ -154,7 +158,26 @@ class MainActivity : ComponentActivity() {
         // Initialize rule of thirds button state
         findViewById<ImageButton>(R.id.ruleOfThirdsBtn).isSelected = renderer.params.showRuleOfThirds
 
-		// Tap-to-focus removed
+		// Tap-to-focus
+		glView.setCameraTouchListener(android.view.View.OnTouchListener { v, event ->
+			if (event.action == MotionEvent.ACTION_UP) {
+				val width = v.width.toFloat()
+				val height = v.height.toFloat()
+				if (width > 0f && height > 0f) {
+					val factory = SurfaceOrientedMeteringPointFactory(width, height)
+					val x = event.x.coerceIn(0f, width)
+					val y = event.y.coerceIn(0f, height)
+					val afPoint = factory.createPoint(x, y)
+					val aePoint = factory.createPoint(x, y)
+					val action = FocusMeteringAction.Builder(afPoint, FocusMeteringAction.FLAG_AF)
+						.addPoint(aePoint, FocusMeteringAction.FLAG_AE)
+						.setAutoCancelDuration(3, TimeUnit.SECONDS)
+						.build()
+					camera?.cameraControl?.startFocusAndMetering(action)
+				}
+			}
+			true
+		})
     }
 
     
