@@ -35,6 +35,7 @@ class PhotoProcessingWorker(
             val grain = inputData.getFloat("grain", 0f)
             val saturation = inputData.getFloat("saturation", 1f)
             val filmName = inputData.getString("filmName") ?: "PROVIA"
+            val exposure = inputData.getFloat("exposure", 0f)
             
             // Create params object
             val film = FilmSim.values().find { it.name == filmName }?.film ?: FilmSim.PROVIA.film
@@ -42,7 +43,8 @@ class PhotoProcessingWorker(
                 film = film.copy(saturation = saturation),
                 halation = halation,
                 bloom = bloom,
-                grain = grain
+                grain = grain,
+                exposure = exposure
             )
             
             Log.d("PhotoProcessingWorker", "Processing photo from $tempFilePath with params: halation=$halation, bloom=$bloom, grain=$grain")
@@ -110,31 +112,89 @@ class PhotoProcessingWorker(
     }
     
     private fun applyFiltersToBitmap(bitmap: Bitmap, params: EffectParams): Bitmap {
-        // Create a mutable copy
         val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-        
-        // Apply film simulation effects
-        val paint = android.graphics.Paint().apply {
-            colorFilter = android.graphics.ColorMatrixColorFilter(
-                android.graphics.ColorMatrix().apply {
-                    setSaturation(params.film.saturation)
-                }
+
+        val width = mutableBitmap.width
+        val height = mutableBitmap.height
+        val pixels = IntArray(width * height)
+        mutableBitmap.getPixels(pixels, 0, width, 0, 0, width, height)
+
+        val exposureMul = Math.pow(2.0, params.exposure.toDouble()).toFloat()
+        val contrast = params.film.contrast
+        val saturation = params.film.saturation
+        val shadowTint = params.film.shadowTint
+        val highlightTint = params.film.highlightTint
+
+        fun mix(a: Float, b: Float, t: Float) = a * (1f - t) + b * t
+        val shadowWarm = floatArrayOf(1.0f, 0.95f, 0.9f)
+        val shadowCool = floatArrayOf(0.9f, 0.95f, 1.05f)
+        val highlightWarm = floatArrayOf(1.05f, 1.0f, 0.95f)
+        val highlightCool = floatArrayOf(0.95f, 1.0f, 1.05f)
+
+        val shadowColor = floatArrayOf(
+            mix(1.0f, if (shadowTint >= 0f) shadowWarm[0] else shadowCool[0], kotlin.math.abs(shadowTint)),
+            mix(1.0f, if (shadowTint >= 0f) shadowWarm[1] else shadowCool[1], kotlin.math.abs(shadowTint)),
+            mix(1.0f, if (shadowTint >= 0f) shadowWarm[2] else shadowCool[2], kotlin.math.abs(shadowTint))
+        )
+        val highlightColor = floatArrayOf(
+            mix(1.0f, if (highlightTint >= 0f) highlightWarm[0] else highlightCool[0], kotlin.math.abs(highlightTint)),
+            mix(1.0f, if (highlightTint >= 0f) highlightWarm[1] else highlightCool[1], kotlin.math.abs(highlightTint)),
+            mix(1.0f, if (highlightTint >= 0f) highlightWarm[2] else highlightCool[2], kotlin.math.abs(highlightTint))
+        )
+
+        fun luma(r: Float, g: Float, b: Float): Float = (0.2126f * r + 0.7152f * g + 0.0722f * b)
+        fun clamp01(v: Float) = v.coerceIn(0f, 1f)
+        fun smoothstep(edge0: Float, edge1: Float, x: Float): Float {
+            val t = clamp01(((x - edge0) / (edge1 - edge0)))
+            return t * t * (3f - 2f * t)
+        }
+
+        for (i in pixels.indices) {
+            val c = pixels[i]
+            var r = (android.graphics.Color.red(c) / 255f)
+            var g = (android.graphics.Color.green(c) / 255f)
+            var b = (android.graphics.Color.blue(c) / 255f)
+
+            // ToneMap: exposure and contrast
+            r = clamp01(((r * exposureMul) - 0.5f) * contrast + 0.5f)
+            g = clamp01(((g * exposureMul) - 0.5f) * contrast + 0.5f)
+            b = clamp01(((b * exposureMul) - 0.5f) * contrast + 0.5f)
+
+            // Saturation via luma mix
+            val Y = luma(r, g, b)
+            r = mix(Y, r, saturation)
+            g = mix(Y, g, saturation)
+            b = mix(Y, b, saturation)
+
+            // Split tone blend
+            val y2 = luma(r, g, b)
+            val t = smoothstep(0.35f, 0.65f, y2)
+            val rs = r * shadowColor[0]
+            val gs = g * shadowColor[1]
+            val bs = b * shadowColor[2]
+            val rh = r * highlightColor[0]
+            val gh = g * highlightColor[1]
+            val bh = b * highlightColor[2]
+            r = mix(rs, rh, t)
+            g = mix(gs, gh, t)
+            b = mix(bs, bh, t)
+
+            pixels[i] = android.graphics.Color.rgb(
+                (clamp01(r) * 255f + 0.5f).toInt(),
+                (clamp01(g) * 255f + 0.5f).toInt(),
+                (clamp01(b) * 255f + 0.5f).toInt()
             )
         }
-        
-        val canvas = android.graphics.Canvas(mutableBitmap)
-        canvas.drawBitmap(bitmap, 0f, 0f, paint)
-        
-        // Apply halation and bloom
+
+        mutableBitmap.setPixels(pixels, 0, width, 0, 0, width, height)
+
         if (params.halation > 0.0f || params.bloom > 0.0f) {
             applyHalationAndBloom(mutableBitmap, params.halation, params.bloom)
         }
-        
-        // Apply grain
         if (params.grain > 0.0f) {
             applyGrainEffect(mutableBitmap, params.grain)
         }
-        
+
         return mutableBitmap
     }
     
