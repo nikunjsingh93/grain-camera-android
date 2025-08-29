@@ -185,7 +185,7 @@ class PhotoProcessingWorker(
         val exposureMul = Math.pow(2.0, params.exposure.toDouble()).toFloat()
         val contrast = params.film.contrast
         val saturation = params.film.saturation
-        val temperature = params.temperature
+        val temperature = params.temperature.coerceIn(-1.5f, 1.5f)
         val shadowTint = params.film.shadowTint
         val highlightTint = params.film.highlightTint
 
@@ -225,8 +225,8 @@ class PhotoProcessingWorker(
             b = clamp01(((b * exposureMul) - 0.5f) * contrast + 0.5f)
 
             // Temperature (white balance)
-            val wbR = 1f + 0.15f * temperature
-            val wbB = 1f - 0.15f * temperature
+            val wbR = 1f + 0.20f * temperature
+            val wbB = 1f - 0.20f * temperature
             r *= wbR
             b *= wbB
 

@@ -88,8 +88,8 @@ void main() {
     vec3 c = base;
     c = toneMap(c, contrast, uParams.w);
     // White balance temperature (subtle gain on R/B)
-    float temp = clamp(uTemperature, -1.0, 1.0);
-    vec3 wb = vec3(1.0 + 0.15 * temp, 1.0, 1.0 - 0.15 * temp);
+    float temp = clamp(uTemperature, -1.5, 1.5);
+    vec3 wb = vec3(1.0 + 0.20 * temp, 1.0, 1.0 - 0.20 * temp);
     c *= wb;
     c = sat(c, saturation);
 

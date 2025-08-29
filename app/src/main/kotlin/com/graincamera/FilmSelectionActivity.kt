@@ -69,7 +69,7 @@ class FilmSelectionActivity : ComponentActivity() {
             val exposure = (findViewById<SeekBar>(R.id.seekExposure).progress / 100f) * 4f - 2f // -2..+2 stops
             val contrast = 0.5f + (findViewById<SeekBar>(R.id.seekContrast).progress / 100f) // 0.5..1.5
             val saturationAdj = 1.2f * (findViewById<SeekBar>(R.id.seekSaturation).progress / 100f) // 0..1.2
-            val temperature = (findViewById<SeekBar>(R.id.seekTemperature).progress / 100f) * 2f - 1f // -1..+1
+            val temperature = (findViewById<SeekBar>(R.id.seekTemperature).progress / 100f) * 3f - 1.5f // -1.5..+1.5
 
             findViewById<TextView>(R.id.valueHalation).text = String.format(Locale.US, "%.0f", halation * 100f)
             findViewById<TextView>(R.id.valueBloom).text = String.format(Locale.US, "%.0f", bloom * 100f)
@@ -116,7 +116,7 @@ class FilmSelectionActivity : ComponentActivity() {
         findViewById<SeekBar>(R.id.seekExposure).progress = (((settings.exposure + 2f) / 4f) * 100f).toInt().coerceIn(0, 100)
         findViewById<SeekBar>(R.id.seekContrast).progress = (((settings.contrast - 0.5f) / 1f) * 100f).toInt().coerceIn(0, 100)
         findViewById<SeekBar>(R.id.seekSaturation).progress = ((settings.saturationAdj / 1.2f) * 100).toInt().coerceIn(0, 100)
-        findViewById<SeekBar>(R.id.seekTemperature).progress = (((settings.temperature + 1f) / 2f) * 100f).toInt().coerceIn(0, 100)
+        findViewById<SeekBar>(R.id.seekTemperature).progress = (((settings.temperature + 1.5f) / 3f) * 100f).toInt().coerceIn(0, 100)
 
         findViewById<TextView>(R.id.valueHalation).text = String.format(Locale.US, "%.0f", settings.halation * 100f)
         findViewById<TextView>(R.id.valueBloom).text = String.format(Locale.US, "%.0f", settings.bloom * 100f)
@@ -212,7 +212,7 @@ object FilmSettingsStore {
         val ex = d.getFloat(k + "_ex", 0f).coerceIn(-2f, 2f)
         val ct = d.getFloat(k + "_ct", 1.0f).coerceIn(0.5f, 1.5f)
         val sa = d.getFloat(k + "_sa", 1.0f).coerceIn(0f, 2f)
-        val tp = d.getFloat(k + "_tp", 0.0f).coerceIn(-1f, 1f)
+        val tp = d.getFloat(k + "_tp", 0.0f).coerceIn(-1.5f, 1.5f)
         return Settings(h, b, g, gs, gr, ex, ct, sa, tp)
     }
     fun saveSettingsForFilm(ctx: android.content.Context, film: String, h: Float, b: Float, g: Float, gs: Float, gr: Float, ex: Float, ct: Float, sa: Float, tp: Float) {
@@ -227,7 +227,7 @@ object FilmSettingsStore {
             .putFloat(k + "_ex", ex.coerceIn(-2f, 2f))
             .putFloat(k + "_ct", ct.coerceIn(0.5f, 1.5f))
             .putFloat(k + "_sa", sa.coerceIn(0f, 2f))
-            .putFloat(k + "_tp", tp.coerceIn(-1f, 1f))
+            .putFloat(k + "_tp", tp.coerceIn(-1.5f, 1.5f))
             .apply()
     }
 
