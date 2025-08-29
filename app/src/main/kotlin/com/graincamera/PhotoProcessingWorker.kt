@@ -44,11 +44,12 @@ class PhotoProcessingWorker(
             val saturation = inputData.getFloat("saturation", 1f)
             val filmName = inputData.getString("filmName") ?: "PROVIA"
             val exposure = inputData.getFloat("exposure", 0f)
+            val contrast = inputData.getFloat("contrast", 1.0f)
             
             // Create params object
-            val film = FilmSim.values().find { it.name == filmName }?.film ?: FilmSim.PROVIA.film
+            val filmBase = FilmSim.values().find { it.name == filmName }?.film ?: FilmSim.PROVIA.film
             val params = EffectParams(
-                film = film.copy(saturation = saturation),
+                film = filmBase.copy(saturation = saturation, contrast = contrast),
                 halation = halation,
                 bloom = bloom,
                 grain = grain,

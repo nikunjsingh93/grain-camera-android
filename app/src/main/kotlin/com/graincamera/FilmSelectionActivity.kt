@@ -55,14 +55,18 @@ class FilmSelectionActivity : ComponentActivity() {
             val grain = findViewById<SeekBar>(R.id.seekGrain).progress / 100f
             val grainSize = 1f + (findViewById<SeekBar>(R.id.seekGrainSize).progress / 100f) * 1f
             val grainRoughness = findViewById<SeekBar>(R.id.seekGrainRoughness).progress / 100f
+            val exposure = (findViewById<SeekBar>(R.id.seekExposure).progress / 100f) * 2f - 1f // -1..+1 stops
+            val contrast = 0.5f + (findViewById<SeekBar>(R.id.seekContrast).progress / 100f) // 0.5..1.5
 
             findViewById<TextView>(R.id.valueHalation).text = String.format(Locale.US, "%.0f", halation * 100f)
             findViewById<TextView>(R.id.valueBloom).text = String.format(Locale.US, "%.0f", bloom * 100f)
             findViewById<TextView>(R.id.valueGrain).text = String.format(Locale.US, "%.0f", grain * 100f)
             findViewById<TextView>(R.id.valueGrainSize).text = String.format(Locale.US, "%.1f px", grainSize)
             findViewById<TextView>(R.id.valueGrainRoughness).text = String.format(Locale.US, "%.0f", grainRoughness * 100f)
+            findViewById<TextView>(R.id.valueExposure).text = String.format(Locale.US, "%.1f stops", exposure)
+            findViewById<TextView>(R.id.valueContrast).text = String.format(Locale.US, "%.0f%%", contrast * 100f)
 
-            FilmSettingsStore.saveSettingsForFilm(this, film.name, halation, bloom, grain, grainSize, grainRoughness)
+            FilmSettingsStore.saveSettingsForFilm(this, film.name, halation, bloom, grain, grainSize, grainRoughness, exposure, contrast)
         }
 
         findViewById<SeekBar>(R.id.seekHalation).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
@@ -70,6 +74,8 @@ class FilmSelectionActivity : ComponentActivity() {
         findViewById<SeekBar>(R.id.seekGrain).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
         findViewById<SeekBar>(R.id.seekGrainSize).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
         findViewById<SeekBar>(R.id.seekGrainRoughness).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
+        findViewById<SeekBar>(R.id.seekExposure).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
+        findViewById<SeekBar>(R.id.seekContrast).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
 
         // Initialize with current film settings
         updateSettingsForFilm(currentFilm)
@@ -90,12 +96,16 @@ class FilmSelectionActivity : ComponentActivity() {
         val clampedGs = settings.grainSize.coerceIn(1f, 2f)
         findViewById<SeekBar>(R.id.seekGrainSize).progress = (((clampedGs - 1f) / 1f) * 100f).toInt().coerceIn(0, 100)
         findViewById<SeekBar>(R.id.seekGrainRoughness).progress = (settings.grainRoughness * 100).toInt()
+        findViewById<SeekBar>(R.id.seekExposure).progress = (((settings.exposure + 1f) / 2f) * 100f).toInt().coerceIn(0, 100)
+        findViewById<SeekBar>(R.id.seekContrast).progress = (((settings.contrast - 0.5f) / 1f) * 100f).toInt().coerceIn(0, 100)
 
         findViewById<TextView>(R.id.valueHalation).text = String.format(Locale.US, "%.0f", settings.halation * 100f)
         findViewById<TextView>(R.id.valueBloom).text = String.format(Locale.US, "%.0f", settings.bloom * 100f)
         findViewById<TextView>(R.id.valueGrain).text = String.format(Locale.US, "%.0f", settings.grain * 100f)
         findViewById<TextView>(R.id.valueGrainSize).text = String.format(Locale.US, "%.1f px", clampedGs)
         findViewById<TextView>(R.id.valueGrainRoughness).text = String.format(Locale.US, "%.0f", settings.grainRoughness * 100f)
+        findViewById<TextView>(R.id.valueExposure).text = String.format(Locale.US, "%.1f stops", settings.exposure)
+        findViewById<TextView>(R.id.valueContrast).text = String.format(Locale.US, "%.0f%%", settings.contrast * 100f)
     }
 }
 
@@ -161,7 +171,7 @@ object FilmSettingsStore {
     private const val KEY_SELECTED = "selected_film"
     private const val KEY_RULE_OF_THIRDS = "rule_of_thirds"
     private fun key(film: String) = "film_settings_" + film
-    data class Settings(val halation: Float, val bloom: Float, val grain: Float, val grainSize: Float, val grainRoughness: Float)
+    data class Settings(val halation: Float, val bloom: Float, val grain: Float, val grainSize: Float, val grainRoughness: Float, val exposure: Float, val contrast: Float)
     fun getSelectedFilm(ctx: android.content.Context): String {
         val d = android.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
         return d.getString(KEY_SELECTED, com.graincamera.gl.FilmSim.PROVIA.name) ?: com.graincamera.gl.FilmSim.PROVIA.name
@@ -173,17 +183,27 @@ object FilmSettingsStore {
     fun getSettingsForFilm(ctx: android.content.Context, film: String): Settings {
         val d = android.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
         val k = key(film)
-        val h = d.getFloat(k + "_h", 0.2f)
-        val b = d.getFloat(k + "_b", 0.3f)
+        val h = d.getFloat(k + "_h", 0.2f).coerceAtMost(0.5f)
+        val b = d.getFloat(k + "_b", 0.3f).coerceAtMost(0.5f)
         val g = d.getFloat(k + "_g", 0.15f)
         val gs = d.getFloat(k + "_gs", 1.5f).coerceIn(1f, 2f)
         val gr = d.getFloat(k + "_gr", 0.5f)
-        return Settings(h, b, g, gs, gr)
+        val ex = d.getFloat(k + "_ex", 0f).coerceIn(-1f, 1f)
+        val ct = d.getFloat(k + "_ct", 1.0f).coerceIn(0.5f, 1.5f)
+        return Settings(h, b, g, gs, gr, ex, ct)
     }
-    fun saveSettingsForFilm(ctx: android.content.Context, film: String, h: Float, b: Float, g: Float, gs: Float, gr: Float) {
+    fun saveSettingsForFilm(ctx: android.content.Context, film: String, h: Float, b: Float, g: Float, gs: Float, gr: Float, ex: Float, ct: Float) {
         val d = android.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
         val k = key(film)
-        d.edit().putFloat(k + "_h", h).putFloat(k + "_b", b).putFloat(k + "_g", g).putFloat(k + "_gs", gs).putFloat(k + "_gr", gr).apply()
+        d.edit()
+            .putFloat(k + "_h", h.coerceAtMost(0.5f))
+            .putFloat(k + "_b", b.coerceAtMost(0.5f))
+            .putFloat(k + "_g", g)
+            .putFloat(k + "_gs", gs.coerceIn(1f, 2f))
+            .putFloat(k + "_gr", gr)
+            .putFloat(k + "_ex", ex.coerceIn(-1f, 1f))
+            .putFloat(k + "_ct", ct.coerceIn(0.5f, 1.5f))
+            .apply()
     }
 
     fun getRuleOfThirds(ctx: android.content.Context): Boolean {

@@ -205,7 +205,15 @@ class MainActivity : ComponentActivity() {
             val selectedFilm = com.graincamera.gl.FilmSim.values().firstOrNull { it.name == selectedFilmName } ?: com.graincamera.gl.FilmSim.PROVIA
             renderer.params = renderer.params.copy(film = selectedFilm.film)
             FilmSettingsStore.getSettingsForFilm(this, selectedFilm.name).let { s ->
-                renderer.params = renderer.params.copy(halation = s.halation, bloom = s.bloom, grain = s.grain, grainSize = s.grainSize, grainRoughness = s.grainRoughness)
+                renderer.params = renderer.params.copy(
+                    halation = s.halation,
+                    bloom = s.bloom,
+                    grain = s.grain,
+                    grainSize = s.grainSize,
+                    grainRoughness = s.grainRoughness,
+                    exposure = s.exposure,
+                    film = renderer.params.film.copy(contrast = s.contrast, saturation = renderer.params.film.saturation)
+                )
             }
             val preview = Preview.Builder()
                 .setTargetRotation(Surface.ROTATION_0)
@@ -491,6 +499,7 @@ class MainActivity : ComponentActivity() {
                 .putFloat("grainRoughness", params.grainRoughness)
                 .putFloat("saturation", params.film.saturation)
                 .putFloat("exposure", params.exposure)
+                .putFloat("contrast", params.film.contrast)
                 .putString("filmName", com.graincamera.gl.FilmSim.values().firstOrNull { it.film == params.film }?.name
                     ?: com.graincamera.gl.FilmSim.PROVIA.name)
                 .build()
