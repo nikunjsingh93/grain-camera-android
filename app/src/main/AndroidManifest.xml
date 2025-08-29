@@ -8,6 +8,9 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.GrainCamera">
         <activity
+            android:name=".FilmSelectionActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

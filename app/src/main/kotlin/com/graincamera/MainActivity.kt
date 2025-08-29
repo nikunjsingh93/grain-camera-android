@@ -22,6 +22,7 @@ import java.util.Locale
 import com.graincamera.R
 import com.graincamera.AspectRatioGLSurfaceView
 import com.graincamera.gl.FilmSim
+import com.graincamera.FilmSettingsStore
 import kotlinx.coroutines.*
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
@@ -89,35 +90,17 @@ class MainActivity : ComponentActivity() {
     
     override fun onResume() {
         super.onResume()
-        if (imageCapture == null) startCamera()
+        // Always re-apply film and settings on resume
+        startCamera()
     }
 
     private fun setupUI(glView: AspectRatioGLSurfaceView) {
         val renderer = glView.renderer
 
-        val spinner = findViewById<Spinner>(R.id.filmSpinner)
-        spinner.adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            FilmSim.values().map { it.displayName }
-        )
-        spinner.setSelection(FilmSim.PROVIA.ordinal)
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
-                renderer.params = renderer.params.copy(film = FilmSim.values()[position].film)
-            }
-            override fun onNothingSelected(parent: AdapterView<*>?) { }
+        findViewById<View>(R.id.captureCircle).setOnClickListener { takePhoto() }
+        findViewById<Button>(R.id.filmBtn).setOnClickListener {
+            startActivity(Intent(this, FilmSelectionActivity::class.java))
         }
-
-        findViewById<SeekBar>(R.id.halationSeek).setOnSeekBarChangeListener(SimpleSeek { v ->
-            renderer.params = renderer.params.copy(halation = v)
-        })
-        findViewById<SeekBar>(R.id.bloomSeek).setOnSeekBarChangeListener(SimpleSeek { v ->
-            renderer.params = renderer.params.copy(bloom = v)
-        })
-        findViewById<SeekBar>(R.id.grainSeek).setOnSeekBarChangeListener(SimpleSeek { v ->
-            renderer.params = renderer.params.copy(grain = v)
-        })
 
         findViewById<Button>(R.id.switchBtn).setOnClickListener {
             cameraSelector = if (cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA)
@@ -125,9 +108,7 @@ class MainActivity : ComponentActivity() {
             startCamera()
         }
 
-        findViewById<Button>(R.id.captureBtn).setOnClickListener {
-            takePhoto()
-        }
+        // capture handled by captureCircle view
     }
 
     private fun startCamera() {
@@ -137,6 +118,13 @@ class MainActivity : ComponentActivity() {
 
             val glView: AspectRatioGLSurfaceView = findViewById(R.id.glView)
             val renderer = glView.renderer
+            // Apply persisted film and settings
+            val selectedFilmName = FilmSettingsStore.getSelectedFilm(this)
+            val selectedFilm = com.graincamera.gl.FilmSim.values().firstOrNull { it.name == selectedFilmName } ?: com.graincamera.gl.FilmSim.PROVIA
+            renderer.params = renderer.params.copy(film = selectedFilm.film)
+            FilmSettingsStore.getSettingsForFilm(this, selectedFilm.name).let { s ->
+                renderer.params = renderer.params.copy(halation = s.halation, bloom = s.bloom, grain = s.grain)
+            }
             val preview = Preview.Builder()
                 .setTargetRotation(Surface.ROTATION_0)
                 .build()
@@ -653,6 +641,12 @@ class MainActivity : ComponentActivity() {
 private class SimpleSeek(val on: (Float)->Unit): SeekBar.OnSeekBarChangeListener {
     private fun map(p: Int): Float = p/100f
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) { on(map(progress)) }
+    override fun onStartTrackingTouch(seekBar: SeekBar?) { }
+    override fun onStopTrackingTouch(seekBar: SeekBar?) { }
+}
+
+class SimpleSeekPublic(val on: ()->Unit): SeekBar.OnSeekBarChangeListener {
+    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) { on() }
     override fun onStartTrackingTouch(seekBar: SeekBar?) { }
     override fun onStopTrackingTouch(seekBar: SeekBar?) { }
 }
