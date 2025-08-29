@@ -2,75 +2,139 @@ package com.graincamera
 
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.activity.ComponentActivity
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.widget.ViewPager2
 import androidx.recyclerview.widget.RecyclerView
 import com.graincamera.gl.FilmSim
 
 class FilmSelectionActivity : ComponentActivity() {
+    private lateinit var viewPager: ViewPager2
+    private lateinit var currentFilmName: TextView
+    private var currentPosition = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_film_selection)
 
-        val list: RecyclerView = findViewById(R.id.filmList)
-        list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        list.adapter = FilmAdapter(FilmSim.values().toList()) { selected ->
-            FilmSettingsStore.setSelectedFilm(this, selected.name)
-            // Load per-film settings into the sliders
-            val settings = FilmSettingsStore.getSettingsForFilm(this, selected.name)
-            findViewById<SeekBar>(R.id.seekHalation).progress = (settings.halation * 100).toInt()
-            findViewById<SeekBar>(R.id.seekBloom).progress = (settings.bloom * 100).toInt()
-            findViewById<SeekBar>(R.id.seekGrain).progress = (settings.grain * 100).toInt()
+        viewPager = findViewById(R.id.filmPager)
+        currentFilmName = findViewById(R.id.currentFilmName)
+        
+        // Set up ViewPager2
+        viewPager.adapter = FilmPagerAdapter(FilmSim.values().toList())
+        viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        
+        // Set initial position to current film
+        val currentFilm = FilmSettingsStore.getSelectedFilm(this)
+        val initialPosition = FilmSim.values().indexOfFirst { it.name == currentFilm }
+        if (initialPosition >= 0) {
+            currentPosition = initialPosition
+            viewPager.setCurrentItem(initialPosition, false)
+            updateFilmName(initialPosition)
         }
+        
+        // Handle page changes
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                currentPosition = position
+                val selectedFilm = FilmSim.values()[position]
+                FilmSettingsStore.setSelectedFilm(this@FilmSelectionActivity, selectedFilm.name)
+                updateFilmName(position)
+                updateSettingsForFilm(selectedFilm.name)
+            }
+        })
 
         fun onSeekChanged() {
-            val film = FilmSettingsStore.getSelectedFilm(this)
+            val film = FilmSim.values()[currentPosition]
             val halation = findViewById<SeekBar>(R.id.seekHalation).progress / 100f
             val bloom = findViewById<SeekBar>(R.id.seekBloom).progress / 100f
             val grain = findViewById<SeekBar>(R.id.seekGrain).progress / 100f
-            FilmSettingsStore.saveSettingsForFilm(this, film, halation, bloom, grain)
+            FilmSettingsStore.saveSettingsForFilm(this, film.name, halation, bloom, grain)
         }
 
         findViewById<SeekBar>(R.id.seekHalation).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
         findViewById<SeekBar>(R.id.seekBloom).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
         findViewById<SeekBar>(R.id.seekGrain).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
 
-        // Initialize with current film
-        val currentFilm = FilmSettingsStore.getSelectedFilm(this)
-        val idx = FilmSim.values().indexOfFirst { it.name == currentFilm }
-        if (idx >= 0) list.scrollToPosition(idx)
-        val s = FilmSettingsStore.getSettingsForFilm(this, currentFilm)
-        findViewById<SeekBar>(R.id.seekHalation).progress = (s.halation * 100).toInt()
-        findViewById<SeekBar>(R.id.seekBloom).progress = (s.bloom * 100).toInt()
-        findViewById<SeekBar>(R.id.seekGrain).progress = (s.grain * 100).toInt()
+        // Initialize with current film settings
+        updateSettingsForFilm(currentFilm)
 
         findViewById<View>(R.id.doneBtn).setOnClickListener { finish() }
     }
+    
+    private fun updateFilmName(position: Int) {
+        val film = FilmSim.values()[position]
+        currentFilmName.text = film.displayName
+    }
+    
+    private fun updateSettingsForFilm(filmName: String) {
+        val settings = FilmSettingsStore.getSettingsForFilm(this, filmName)
+        findViewById<SeekBar>(R.id.seekHalation).progress = (settings.halation * 100).toInt()
+        findViewById<SeekBar>(R.id.seekBloom).progress = (settings.bloom * 100).toInt()
+        findViewById<SeekBar>(R.id.seekGrain).progress = (settings.grain * 100).toInt()
+    }
 }
 
-private class FilmAdapter(
-    private val films: List<FilmSim>,
-    private val onSelect: (FilmSim) -> Unit
-) : RecyclerView.Adapter<FilmVH>() {
-    override fun onCreateViewHolder(parent: android.view.ViewGroup, viewType: Int): FilmVH {
-        val tv = TextView(parent.context)
-        tv.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        tv.setPadding(32, 24, 32, 24)
-        tv.setTextColor(0xFFFFFFFF.toInt())
-        return FilmVH(tv)
+private class FilmPagerAdapter(
+    private val films: List<FilmSim>
+) : RecyclerView.Adapter<FilmPagerAdapter.FilmViewHolder>() {
+    
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilmViewHolder {
+        val container = LinearLayout(parent.context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            setPadding(16, 16, 16, 16)
+        }
+        
+        val filmBox = LinearLayout(parent.context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
+            background = parent.context.getDrawable(R.drawable.film_strip_box)
+            gravity = android.view.Gravity.CENTER
+        }
+        
+        val filmName = TextView(parent.context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            setTextColor(0xFFFFFFFF.toInt())
+            textSize = 16f
+            gravity = android.view.Gravity.CENTER
+        }
+        
+        filmBox.addView(filmName)
+        container.addView(filmBox)
+        
+        return FilmViewHolder(container, filmName, filmBox)
     }
+    
     override fun getItemCount(): Int = films.size
-    override fun onBindViewHolder(holder: FilmVH, position: Int) {
-        val item = films[position]
-        holder.text.text = item.displayName
-        holder.text.setOnClickListener { onSelect(item) }
+    
+    override fun onBindViewHolder(holder: FilmViewHolder, position: Int) {
+        val film = films[position]
+        holder.filmName.text = film.displayName
+        
+        // Check if this is the currently selected film
+        val isSelected = FilmSettingsStore.getSelectedFilm(holder.itemView.context) == film.name
+        holder.filmBox.background = holder.itemView.context.getDrawable(
+            if (isSelected) R.drawable.film_strip_selected else R.drawable.film_strip_box
+        )
     }
+    
+    class FilmViewHolder(
+        itemView: View,
+        val filmName: TextView,
+        val filmBox: LinearLayout
+    ) : RecyclerView.ViewHolder(itemView)
 }
-
-private class FilmVH(val text: TextView) : RecyclerView.ViewHolder(text)
 
 object FilmSettingsStore {
     private const val KEY_SELECTED = "selected_film"
