@@ -12,6 +12,11 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.work.ForegroundInfo
+import androidx.core.app.NotificationCompat
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import com.graincamera.gl.FilmSim
 import com.graincamera.gl.EffectParams
 import kotlinx.coroutines.Dispatchers
@@ -30,9 +35,33 @@ class PhotoProcessingWorker(
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        val channelId = "photo_processing_fg"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            if (nm.getNotificationChannel(channelId) == null) {
+                nm.createNotificationChannel(
+                    NotificationChannel(channelId, "Photo Processing", NotificationManager.IMPORTANCE_LOW)
+                )
+            }
+        }
+        val notification: Notification = NotificationCompat.Builder(context, channelId)
+            .setContentTitle("Processing photo")
+            .setContentText("Saving to gallery…")
+            .setSmallIcon(android.R.drawable.ic_menu_camera)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setProgress(0, 0, true)
+            .build()
+        return ForegroundInfo(2001, notification)
+    }
+
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         var tempFilePath: String? = null
         try {
+            // Promote to foreground to survive background restrictions (Android 13)
+            setForeground(getForegroundInfo())
+
             // Get input data
             val timestamp = inputData.getString("timestamp") ?: return@withContext Result.failure()
             tempFilePath = inputData.getString("tempFilePath") ?: return@withContext Result.failure()

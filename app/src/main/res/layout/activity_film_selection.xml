@@ -33,12 +33,24 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Halation"
-                android:textColor="#FFFFFF"
-                android:paddingTop="6dp"/>
+                android:orientation="horizontal"
+                android:paddingTop="6dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Halation"
+                    android:textColor="#FFFFFF"/>
+                <TextView
+                    android:id="@+id/valueHalation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:text="0"/>
+            </LinearLayout>
             <SeekBar
                 android:id="@+id/seekHalation"
                 android:layout_width="match_parent"
@@ -47,20 +59,26 @@
                 android:thumb="@drawable/seekbar_thumb_big"
                 android:minHeight="40dp"
                 android:thumbOffset="10dp"/>
-            <TextView
-                android:id="@+id/valueHalation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#AAAAAA"
-                android:paddingBottom="2dp"
-                android:text="0"/>
+            
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Bloom"
-                android:textColor="#FFFFFF"
-                android:paddingTop="6dp"/>
+                android:orientation="horizontal"
+                android:paddingTop="6dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Bloom"
+                    android:textColor="#FFFFFF"/>
+                <TextView
+                    android:id="@+id/valueBloom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:text="0"/>
+            </LinearLayout>
             <SeekBar
                 android:id="@+id/seekBloom"
                 android:layout_width="match_parent"
@@ -69,20 +87,26 @@
                 android:thumb="@drawable/seekbar_thumb_big"
                 android:minHeight="40dp"
                 android:thumbOffset="10dp"/>
-            <TextView
-                android:id="@+id/valueBloom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#AAAAAA"
-                android:paddingBottom="2dp"
-                android:text="0"/>
+            
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Grain"
-                android:textColor="#FFFFFF"
-                android:paddingTop="6dp"/>
+                android:orientation="horizontal"
+                android:paddingTop="6dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Grain"
+                    android:textColor="#FFFFFF"/>
+                <TextView
+                    android:id="@+id/valueGrain"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:text="0"/>
+            </LinearLayout>
             <SeekBar
                 android:id="@+id/seekGrain"
                 android:layout_width="match_parent"
@@ -91,20 +115,26 @@
                 android:thumb="@drawable/seekbar_thumb_big"
                 android:minHeight="40dp"
                 android:thumbOffset="10dp"/>
-            <TextView
-                android:id="@+id/valueGrain"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#AAAAAA"
-                android:paddingBottom="2dp"
-                android:text="0"/>
+            
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Grain Size"
-                android:textColor="#FFFFFF"
-                android:paddingTop="6dp"/>
+                android:orientation="horizontal"
+                android:paddingTop="6dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Grain Size"
+                    android:textColor="#FFFFFF"/>
+                <TextView
+                    android:id="@+id/valueGrainSize"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:text="1.0 px"/>
+            </LinearLayout>
             <SeekBar
                 android:id="@+id/seekGrainSize"
                 android:layout_width="match_parent"
@@ -113,20 +143,26 @@
                 android:thumb="@drawable/seekbar_thumb_big"
                 android:minHeight="40dp"
                 android:thumbOffset="10dp"/>
-            <TextView
-                android:id="@+id/valueGrainSize"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#AAAAAA"
-                android:paddingBottom="2dp"
-                android:text="1.0 px"/>
+            
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Grain Roughness"
-                android:textColor="#FFFFFF"
-                android:paddingTop="6dp"/>
+                android:orientation="horizontal"
+                android:paddingTop="6dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Grain Roughness"
+                    android:textColor="#FFFFFF"/>
+                <TextView
+                    android:id="@+id/valueGrainRoughness"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:text="50"/>
+            </LinearLayout>
             <SeekBar
                 android:id="@+id/seekGrainRoughness"
                 android:layout_width="match_parent"
@@ -135,20 +171,26 @@
                 android:thumb="@drawable/seekbar_thumb_big"
                 android:minHeight="40dp"
                 android:thumbOffset="10dp"/>
-            <TextView
-                android:id="@+id/valueGrainRoughness"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#AAAAAA"
-                android:paddingBottom="2dp"
-                android:text="50"/>
+            
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Exposure"
-                android:textColor="#FFFFFF"
-                android:paddingTop="6dp"/>
+                android:orientation="horizontal"
+                android:paddingTop="6dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Exposure"
+                    android:textColor="#FFFFFF"/>
+                <TextView
+                    android:id="@+id/valueExposure"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:text="0.0 stops"/>
+            </LinearLayout>
             <SeekBar
                 android:id="@+id/seekExposure"
                 android:layout_width="match_parent"
@@ -157,20 +199,26 @@
                 android:thumb="@drawable/seekbar_thumb_big"
                 android:minHeight="40dp"
                 android:thumbOffset="10dp"/>
-            <TextView
-                android:id="@+id/valueExposure"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#AAAAAA"
-                android:paddingBottom="2dp"
-                android:text="0.0 stops"/>
+            
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Contrast"
-                android:textColor="#FFFFFF"
-                android:paddingTop="6dp"/>
+                android:orientation="horizontal"
+                android:paddingTop="6dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Contrast"
+                    android:textColor="#FFFFFF"/>
+                <TextView
+                    android:id="@+id/valueContrast"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#AAAAAA"
+                    android:text="100%"/>
+            </LinearLayout>
             <SeekBar
                 android:id="@+id/seekContrast"
                 android:layout_width="match_parent"
@@ -179,13 +227,7 @@
                 android:thumb="@drawable/seekbar_thumb_big"
                 android:minHeight="40dp"
                 android:thumbOffset="10dp"/>
-            <TextView
-                android:id="@+id/valueContrast"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#AAAAAA"
-                android:paddingBottom="6dp"
-                android:text="100%"/>
+            
 
             <Button
                 android:id="@+id/doneBtn"

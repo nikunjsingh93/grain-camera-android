@@ -77,7 +77,10 @@ class MainActivity : ComponentActivity() {
         val storageGranted = if (Build.VERSION.SDK_INT < 29) {
             results[Manifest.permission.WRITE_EXTERNAL_STORAGE] == true
         } else true
-        if (cameraGranted && storageGranted) startCamera()
+        val notifGranted = if (Build.VERSION.SDK_INT >= 33) {
+            results[Manifest.permission.POST_NOTIFICATIONS] == true
+        } else true
+        if (cameraGranted && storageGranted && notifGranted) startCamera()
         else Toast.makeText(this, "Permissions denied", Toast.LENGTH_LONG).show()
     }
 
@@ -99,6 +102,7 @@ class MainActivity : ComponentActivity() {
         val needLegacyStorage = Build.VERSION.SDK_INT < 29
         val perms = mutableListOf(Manifest.permission.CAMERA)
         if (needLegacyStorage) perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (Build.VERSION.SDK_INT >= 33) perms.add(Manifest.permission.POST_NOTIFICATIONS)
         val allGranted = perms.all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
         if (allGranted) startCamera() else requestPermission.launch(perms.toTypedArray())
     }
@@ -262,9 +266,8 @@ class MainActivity : ComponentActivity() {
             return
         }
 
-        // Show immediate feedback
+        // Show immediate feedback; worker will run in foreground and show notification
         Toast.makeText(this, "Photo captured! Processing in background...", Toast.LENGTH_SHORT).show()
-        showProcessingNotification()
 
         // Use ImageCapture with a callback to queue the image for background processing
         ic.takePicture(
@@ -281,7 +284,6 @@ class MainActivity : ComponentActivity() {
                     } catch (e: Exception) {
                         e.printStackTrace()
                         Toast.makeText(this@MainActivity, "Failed to capture photo: ${e.message}", Toast.LENGTH_LONG).show()
-                        hideProcessingNotification()
                     } finally {
                         image.close()
                     }
@@ -289,7 +291,6 @@ class MainActivity : ComponentActivity() {
 
                 override fun onError(exc: ImageCaptureException) {
                     Toast.makeText(this@MainActivity, "Capture failed: ${exc.message}", Toast.LENGTH_LONG).show()
-                    hideProcessingNotification()
                 }
             }
         )
@@ -443,17 +444,17 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun showProcessingNotification() {
+    private fun showProcessingNotification(preview: Bitmap? = null) {
         val count = processingCounter.incrementAndGet()
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Processing Photos")
             .setContentText("$count photo${if (count > 1) "s" else ""} in queue")
             .setSmallIcon(android.R.drawable.ic_menu_camera)
             .setOngoing(true)
+            .setOnlyAlertOnce(true)
             .setProgress(0, 0, true)
-            .build()
-        
-        notificationManager.notify(NOTIFICATION_ID, notification)
+        preview?.let { builder.setStyle(NotificationCompat.BigPictureStyle().bigPicture(it)) }
+        notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
 
     private fun hideProcessingNotification() {
