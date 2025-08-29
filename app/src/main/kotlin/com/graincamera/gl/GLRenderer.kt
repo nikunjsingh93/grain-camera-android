@@ -117,8 +117,8 @@ class GLRenderer(private val context: Context) : GLSurfaceView.Renderer, Surface
         GLES20.glUniform1f(uTime, t)
 
         val p = params
-        GLES20.glUniform4f(uParams, p.halation, p.bloom, p.grain, p.exposure)
-        GLES20.glUniform1f(uGrainSizeLoc, p.grainSize)
+        GLES20.glUniform4f(uParams, p.halation, p.bloom, 0f, p.exposure) // disable grain in preview
+        GLES20.glUniform1f(uGrainSizeLoc, max(1f, min(2f, p.grainSize)))
         GLES20.glUniform1f(uGrainRoughnessLoc, p.grainRoughness)
         GLES20.glUniform4f(uFilm, p.film.contrast, p.film.saturation, p.film.shadowTint, p.film.highlightTint)
         GLES20.glUniform1i(uShowRuleOfThirds, if (p.showRuleOfThirds) 1 else 0)
@@ -240,8 +240,8 @@ class GLRenderer(private val context: Context) : GLSurfaceView.Renderer, Surface
         GLES20.glUniform1f(uTime, t)
 
         val p = params
-        GLES20.glUniform4f(uParams, p.halation, p.bloom, p.grain, p.exposure)
-        GLES20.glUniform1f(uGrainSizeLoc, p.grainSize)
+        GLES20.glUniform4f(uParams, p.halation, p.bloom, 0f, p.exposure) // disable grain in preview
+        GLES20.glUniform1f(uGrainSizeLoc, max(1f, min(2f, p.grainSize)))
         GLES20.glUniform1f(uGrainRoughnessLoc, p.grainRoughness)
         GLES20.glUniform4f(uFilm, p.film.contrast, p.film.saturation, p.film.shadowTint, p.film.highlightTint)
         GLES20.glUniform1i(uShowRuleOfThirds, if (p.showRuleOfThirds) 1 else 0)
@@ -321,8 +321,8 @@ class GLRenderer(private val context: Context) : GLSurfaceView.Renderer, Surface
         GLES20.glUniform1f(uTime, t)
 
         val p = params
-        GLES20.glUniform4f(uParams, p.halation, p.bloom, p.grain, p.exposure)
-        GLES20.glUniform1f(uGrainSizeLoc, p.grainSize)
+        GLES20.glUniform4f(uParams, p.halation, p.bloom, 0f, p.exposure) // disable grain in preview
+        GLES20.glUniform1f(uGrainSizeLoc, max(1f, min(2f, p.grainSize)))
         GLES20.glUniform1f(uGrainRoughnessLoc, p.grainRoughness)
         GLES20.glUniform4f(uFilm, p.film.contrast, p.film.saturation, p.film.shadowTint, p.film.highlightTint)
         GLES20.glUniform1i(uShowRuleOfThirds, if (p.showRuleOfThirds) 1 else 0)

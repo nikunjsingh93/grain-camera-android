@@ -53,7 +53,7 @@ class FilmSelectionActivity : ComponentActivity() {
             val halation = findViewById<SeekBar>(R.id.seekHalation).progress / 100f
             val bloom = findViewById<SeekBar>(R.id.seekBloom).progress / 100f
             val grain = findViewById<SeekBar>(R.id.seekGrain).progress / 100f
-            val grainSize = 1f + (findViewById<SeekBar>(R.id.seekGrainSize).progress / 100f) * 7f
+            val grainSize = 1f + (findViewById<SeekBar>(R.id.seekGrainSize).progress / 100f) * 1f
             val grainRoughness = findViewById<SeekBar>(R.id.seekGrainRoughness).progress / 100f
 
             findViewById<TextView>(R.id.valueHalation).text = String.format(Locale.US, "%.0f", halation * 100f)
@@ -87,13 +87,14 @@ class FilmSelectionActivity : ComponentActivity() {
         findViewById<SeekBar>(R.id.seekHalation).progress = (settings.halation * 100).toInt()
         findViewById<SeekBar>(R.id.seekBloom).progress = (settings.bloom * 100).toInt()
         findViewById<SeekBar>(R.id.seekGrain).progress = (settings.grain * 100).toInt()
-        findViewById<SeekBar>(R.id.seekGrainSize).progress = (((settings.grainSize - 1f) / 7f) * 100f).toInt().coerceIn(0, 100)
+        val clampedGs = settings.grainSize.coerceIn(1f, 2f)
+        findViewById<SeekBar>(R.id.seekGrainSize).progress = (((clampedGs - 1f) / 1f) * 100f).toInt().coerceIn(0, 100)
         findViewById<SeekBar>(R.id.seekGrainRoughness).progress = (settings.grainRoughness * 100).toInt()
 
         findViewById<TextView>(R.id.valueHalation).text = String.format(Locale.US, "%.0f", settings.halation * 100f)
         findViewById<TextView>(R.id.valueBloom).text = String.format(Locale.US, "%.0f", settings.bloom * 100f)
         findViewById<TextView>(R.id.valueGrain).text = String.format(Locale.US, "%.0f", settings.grain * 100f)
-        findViewById<TextView>(R.id.valueGrainSize).text = String.format(Locale.US, "%.1f px", settings.grainSize)
+        findViewById<TextView>(R.id.valueGrainSize).text = String.format(Locale.US, "%.1f px", clampedGs)
         findViewById<TextView>(R.id.valueGrainRoughness).text = String.format(Locale.US, "%.0f", settings.grainRoughness * 100f)
     }
 }
@@ -175,7 +176,7 @@ object FilmSettingsStore {
         val h = d.getFloat(k + "_h", 0.2f)
         val b = d.getFloat(k + "_b", 0.3f)
         val g = d.getFloat(k + "_g", 0.15f)
-        val gs = d.getFloat(k + "_gs", 1.5f)
+        val gs = d.getFloat(k + "_gs", 1.5f).coerceIn(1f, 2f)
         val gr = d.getFloat(k + "_gr", 0.5f)
         return Settings(h, b, g, gs, gr)
     }
