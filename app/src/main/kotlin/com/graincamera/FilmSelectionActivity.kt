@@ -10,6 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.viewpager2.widget.ViewPager2
 import androidx.recyclerview.widget.RecyclerView
 import com.graincamera.gl.FilmSim
+import java.util.Locale
 
 class FilmSelectionActivity : ComponentActivity() {
     private lateinit var viewPager: ViewPager2
@@ -52,12 +53,20 @@ class FilmSelectionActivity : ComponentActivity() {
             val halation = findViewById<SeekBar>(R.id.seekHalation).progress / 100f
             val bloom = findViewById<SeekBar>(R.id.seekBloom).progress / 100f
             val grain = findViewById<SeekBar>(R.id.seekGrain).progress / 100f
-            FilmSettingsStore.saveSettingsForFilm(this, film.name, halation, bloom, grain)
+            val grainSize = 1f + (findViewById<SeekBar>(R.id.seekGrainSize).progress / 100f) * 7f
+
+            findViewById<TextView>(R.id.valueHalation).text = String.format(Locale.US, "%.0f", halation * 100f)
+            findViewById<TextView>(R.id.valueBloom).text = String.format(Locale.US, "%.0f", bloom * 100f)
+            findViewById<TextView>(R.id.valueGrain).text = String.format(Locale.US, "%.0f", grain * 100f)
+            findViewById<TextView>(R.id.valueGrainSize).text = String.format(Locale.US, "%.1f px", grainSize)
+
+            FilmSettingsStore.saveSettingsForFilm(this, film.name, halation, bloom, grain, grainSize)
         }
 
         findViewById<SeekBar>(R.id.seekHalation).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
         findViewById<SeekBar>(R.id.seekBloom).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
         findViewById<SeekBar>(R.id.seekGrain).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
+        findViewById<SeekBar>(R.id.seekGrainSize).setOnSeekBarChangeListener(SimpleSeekPublic { onSeekChanged() })
 
         // Initialize with current film settings
         updateSettingsForFilm(currentFilm)
@@ -75,6 +84,12 @@ class FilmSelectionActivity : ComponentActivity() {
         findViewById<SeekBar>(R.id.seekHalation).progress = (settings.halation * 100).toInt()
         findViewById<SeekBar>(R.id.seekBloom).progress = (settings.bloom * 100).toInt()
         findViewById<SeekBar>(R.id.seekGrain).progress = (settings.grain * 100).toInt()
+        findViewById<SeekBar>(R.id.seekGrainSize).progress = (((settings.grainSize - 1f) / 7f) * 100f).toInt().coerceIn(0, 100)
+
+        findViewById<TextView>(R.id.valueHalation).text = String.format(Locale.US, "%.0f", settings.halation * 100f)
+        findViewById<TextView>(R.id.valueBloom).text = String.format(Locale.US, "%.0f", settings.bloom * 100f)
+        findViewById<TextView>(R.id.valueGrain).text = String.format(Locale.US, "%.0f", settings.grain * 100f)
+        findViewById<TextView>(R.id.valueGrainSize).text = String.format(Locale.US, "%.1f px", settings.grainSize)
     }
 }
 
@@ -140,7 +155,7 @@ object FilmSettingsStore {
     private const val KEY_SELECTED = "selected_film"
     private const val KEY_RULE_OF_THIRDS = "rule_of_thirds"
     private fun key(film: String) = "film_settings_" + film
-    data class Settings(val halation: Float, val bloom: Float, val grain: Float)
+    data class Settings(val halation: Float, val bloom: Float, val grain: Float, val grainSize: Float)
     fun getSelectedFilm(ctx: android.content.Context): String {
         val d = android.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
         return d.getString(KEY_SELECTED, com.graincamera.gl.FilmSim.PROVIA.name) ?: com.graincamera.gl.FilmSim.PROVIA.name
@@ -155,12 +170,13 @@ object FilmSettingsStore {
         val h = d.getFloat(k + "_h", 0.2f)
         val b = d.getFloat(k + "_b", 0.3f)
         val g = d.getFloat(k + "_g", 0.15f)
-        return Settings(h, b, g)
+        val gs = d.getFloat(k + "_gs", 1.5f)
+        return Settings(h, b, g, gs)
     }
-    fun saveSettingsForFilm(ctx: android.content.Context, film: String, h: Float, b: Float, g: Float) {
+    fun saveSettingsForFilm(ctx: android.content.Context, film: String, h: Float, b: Float, g: Float, gs: Float) {
         val d = android.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
         val k = key(film)
-        d.edit().putFloat(k + "_h", h).putFloat(k + "_b", b).putFloat(k + "_g", g).apply()
+        d.edit().putFloat(k + "_h", h).putFloat(k + "_b", b).putFloat(k + "_g", g).putFloat(k + "_gs", gs).apply()
     }
 
     fun getRuleOfThirds(ctx: android.content.Context): Boolean {

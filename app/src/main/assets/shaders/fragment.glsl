@@ -9,6 +9,8 @@ uniform vec4 uParams;
 // x=contrast, y=saturation, z=shadowTint, w=highlightTint
 uniform vec4 uFilm;
 uniform int uShowRuleOfThirds;
+// Grain size in pixels (1..N)
+uniform float uGrainSize;
 
 varying vec2 vTexCoord;
 
@@ -72,18 +74,26 @@ void main() {
 
     c = mix(c * shadowColor, c * highlightColor, smoothstep(0.35, 0.65, Y));
 
-    // Bright-pass for bloom/halation
-    float bright = smoothstep(0.85, 1.0, Y);
-    vec3 blurred = blur9(vTexCoord, 2.0 + 6.0 * (uParams.x + uParams.y));
-    vec3 bloom = blurred * bright;
-    // Halation: red-biased halo, scaled by halation param
-    vec3 halation = vec3(bloom.r, bloom.g * 0.3, bloom.b * 0.2) * uParams.x;
+    // Bright-pass for bloom/halation with slightly softer transition for halation
+    float brightBloom = smoothstep(0.85, 1.0, Y);
+    float brightHalation = smoothstep(0.80, 1.0, Y);
+
+    // Use separate blur radii to get softer, wider halation edges
+    float radiusBloom = 2.0 + 6.0 * uParams.y;
+    float radiusHalation = 3.0 + 10.0 * uParams.x;
+    vec3 blurredBloom = blur9(vTexCoord, radiusBloom);
+    vec3 blurredHalation = blur9(vTexCoord, radiusHalation);
+    vec3 bloom = blurredBloom * brightBloom;
+    // Halation: red-biased halo, scaled by halation param and halation bright-pass
+    vec3 halation = vec3(blurredHalation.r, blurredHalation.g * 0.3, blurredHalation.b * 0.2) * (uParams.x * brightHalation);
 
     // Combine
     c += bloom * uParams.y + halation;
 
-    // Grain
-    float g = (rand(vTexCoord * uResolution + uTime*60.0) - 0.5) * uParams.z * 0.25;
+    // Grain: adjustable size. uGrainSize in pixels; larger -> chunkier grain
+    float gs = max(1.0, uGrainSize);
+    vec2 grainCoord = floor(vTexCoord * uResolution / gs);
+    float g = (rand(grainCoord + uTime*60.0) - 0.5) * uParams.z * 0.25;
     c += g;
 
     // Rule of thirds overlay

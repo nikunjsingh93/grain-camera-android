@@ -34,6 +34,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:max="100"/>
+    <TextView
+        android:id="@+id/valueHalation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#AAAAAA"
+        android:text="0"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -46,6 +52,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:max="100"/>
+    <TextView
+        android:id="@+id/valueBloom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#AAAAAA"
+        android:text="0"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -58,6 +70,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:max="100"/>
+    <TextView
+        android:id="@+id/valueGrain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#AAAAAA"
+        android:text="0"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Grain Size"
+        android:textColor="#FFFFFF"
+        android:paddingTop="8dp"/>
+    <SeekBar
+        android:id="@+id/seekGrainSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"/>
+    <TextView
+        android:id="@+id/valueGrainSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#AAAAAA"
+        android:text="1.0 px"/>
 
     <Button
         android:id="@+id/doneBtn"

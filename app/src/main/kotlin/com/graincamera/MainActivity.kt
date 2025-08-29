@@ -47,6 +47,7 @@ import java.util.concurrent.TimeUnit
 import androidx.work.WorkManager
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkRequest
+import androidx.work.WorkInfo
 import androidx.work.Data
 import java.util.concurrent.atomic.AtomicInteger
 import java.io.File
@@ -70,10 +71,14 @@ class MainActivity : ComponentActivity() {
     private val NOTIFICATION_ID = 1001
 
     private val requestPermission = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) startCamera()
-        else Toast.makeText(this, "Camera permission denied", Toast.LENGTH_LONG).show()
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { results ->
+        val cameraGranted = results[Manifest.permission.CAMERA] == true
+        val storageGranted = if (Build.VERSION.SDK_INT < 29) {
+            results[Manifest.permission.WRITE_EXTERNAL_STORAGE] == true
+        } else true
+        if (cameraGranted && storageGranted) startCamera()
+        else Toast.makeText(this, "Permissions denied", Toast.LENGTH_LONG).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,10 +96,11 @@ class MainActivity : ComponentActivity() {
         setupUI(glView)
         
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_GRANTED) {
-            startCamera()
-        } else requestPermission.launch(Manifest.permission.CAMERA)
+        val needLegacyStorage = Build.VERSION.SDK_INT < 29
+        val perms = mutableListOf(Manifest.permission.CAMERA)
+        if (needLegacyStorage) perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val allGranted = perms.all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
+        if (allGranted) startCamera() else requestPermission.launch(perms.toTypedArray())
     }
     
     override fun onResume() {
@@ -199,7 +205,7 @@ class MainActivity : ComponentActivity() {
             val selectedFilm = com.graincamera.gl.FilmSim.values().firstOrNull { it.name == selectedFilmName } ?: com.graincamera.gl.FilmSim.PROVIA
             renderer.params = renderer.params.copy(film = selectedFilm.film)
             FilmSettingsStore.getSettingsForFilm(this, selectedFilm.name).let { s ->
-                renderer.params = renderer.params.copy(halation = s.halation, bloom = s.bloom, grain = s.grain)
+                renderer.params = renderer.params.copy(halation = s.halation, bloom = s.bloom, grain = s.grain, grainSize = s.grainSize)
             }
             val preview = Preview.Builder()
                 .setTargetRotation(Surface.ROTATION_0)
@@ -481,6 +487,7 @@ class MainActivity : ComponentActivity() {
                 .putFloat("halation", params.halation)
                 .putFloat("bloom", params.bloom)
                 .putFloat("grain", params.grain)
+                .putFloat("grainSize", params.grainSize)
                 .putFloat("saturation", params.film.saturation)
                 .putFloat("exposure", params.exposure)
                 .putString("filmName", com.graincamera.gl.FilmSim.values().firstOrNull { it.film == params.film }?.name
@@ -493,6 +500,19 @@ class MainActivity : ComponentActivity() {
                 .build()
             
             workManager.enqueue(photoProcessingWork)
+            workManager.getWorkInfoByIdLiveData(photoProcessingWork.id)
+                .observe(this) { info ->
+                    if (info != null && info.state == WorkInfo.State.SUCCEEDED) {
+                        hideProcessingNotification()
+                        val savedUri = info.outputData.getString("savedUri")
+                        if (savedUri != null) {
+                            Toast.makeText(this, "Saved to Gallery", Toast.LENGTH_SHORT).show()
+                        }
+                    } else if (info != null && info.state == WorkInfo.State.FAILED) {
+                        hideProcessingNotification()
+                        Toast.makeText(this, "Save failed", Toast.LENGTH_LONG).show()
+                    }
+                }
             
             // Clean up the original bitmap
             bitmap.recycle()
