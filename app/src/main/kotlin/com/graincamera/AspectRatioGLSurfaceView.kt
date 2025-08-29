@@ -2,8 +2,7 @@ package com.graincamera
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.MotionEvent
-import android.view.View
+ 
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.graincamera.gl.CameraGLSurfaceView
@@ -31,13 +30,9 @@ class AspectRatioGLSurfaceView @JvmOverloads constructor(
         glSurfaceView.setZOrderOnTop(onTop)
     }
     
-    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
-        return false
-    }
+    
 
-    fun setCameraTouchListener(listener: OnTouchListener) {
-        glSurfaceView.setOnTouchListener(listener)
-    }
+    fun setCameraTouchListener(listener: OnTouchListener) { /* removed: no-op */ }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = MeasureSpec.getSize(widthMeasureSpec)
