@@ -11,6 +11,8 @@ uniform vec4 uFilm;
 uniform int uShowRuleOfThirds;
 // Grain size in pixels (1..N)
 uniform float uGrainSize;
+// Grain roughness (0..1) controls higher-frequency contribution
+uniform float uGrainRoughness;
 
 varying vec2 vTexCoord;
 
@@ -46,9 +48,30 @@ vec3 blur9(vec2 uv, float radius) {
     return acc / wsum;
 }
 
-// Grain (value 0..1)
-float rand(vec2 co){
-    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+// Hash-based value noise and fbm for film-like grain
+float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
+float valueNoise(vec2 p){
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    float a = hash(i);
+    float b = hash(i + vec2(1.0, 0.0));
+    float c = hash(i + vec2(0.0, 1.0));
+    float d = hash(i + vec2(1.0, 1.0));
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+}
+float fbm(vec2 p, float rough){
+    float sum = 0.0;
+    float amp = 0.6;
+    float freq = 1.0;
+    // roughness increases higher octave weights
+    float r2 = clamp(rough, 0.0, 1.0);
+    for (int i = 0; i < 4; i++) {
+        sum += valueNoise(p * freq) * amp;
+        freq *= 2.0;
+        amp *= mix(0.45, 0.75, r2);
+    }
+    return sum;
 }
 
 void main() {
@@ -90,11 +113,18 @@ void main() {
     // Combine
     c += bloom * uParams.y + halation;
 
-    // Grain: adjustable size. uGrainSize in pixels; larger -> chunkier grain
+    // Film-like grain via fbm value noise. Stable in screen space, animated slowly.
     float gs = max(1.0, uGrainSize);
-    vec2 grainCoord = floor(vTexCoord * uResolution / gs);
-    float g = (rand(grainCoord + uTime*60.0) - 0.5) * uParams.z * 0.25;
-    c += g;
+    vec2 grainBase = (vTexCoord * uResolution) / gs;
+    float ang = 0.37 * uTime; // slight rotation to break grid
+    mat2 rot = mat2(cos(ang), -sin(ang), sin(ang), cos(ang));
+    vec2 gc = rot * grainBase + vec2(0.0, uTime * 0.25);
+    float n = fbm(gc, uGrainRoughness);
+    float g = (n - 0.5);
+    // Modulate visibility: more in shadows/midtones, less in bright highlights
+    float vis = mix(1.0, 0.6, smoothstep(0.65, 1.0, Y));
+    vec3 grainColor = vec3(0.98, 1.0, 1.02); // subtle chroma variance
+    c += grainColor * (g * uParams.z * 0.35 * vis);
 
     // Rule of thirds overlay
     if (uShowRuleOfThirds == 1) {

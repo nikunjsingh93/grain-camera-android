@@ -40,6 +40,7 @@ class PhotoProcessingWorker(
             val bloom = inputData.getFloat("bloom", 0f)
             val grain = inputData.getFloat("grain", 0f)
             val grainSize = inputData.getFloat("grainSize", 1.5f)
+            val grainRoughness = inputData.getFloat("grainRoughness", 0.5f)
             val saturation = inputData.getFloat("saturation", 1f)
             val filmName = inputData.getString("filmName") ?: "PROVIA"
             val exposure = inputData.getFloat("exposure", 0f)
@@ -52,10 +53,11 @@ class PhotoProcessingWorker(
                 bloom = bloom,
                 grain = grain,
                 grainSize = grainSize,
+                grainRoughness = grainRoughness,
                 exposure = exposure
             )
             
-            Log.d("PhotoProcessingWorker", "Processing photo from $tempFilePath with params: halation=$halation, bloom=$bloom, grain=$grain, grainSize=$grainSize")
+            Log.d("PhotoProcessingWorker", "Processing photo from $tempFilePath with params: halation=$halation, bloom=$bloom, grain=$grain, grainSize=$grainSize, grainRoughness=$grainRoughness")
             
             // Load bitmap from temp file
             val tempFile = File(tempFilePath)
@@ -221,7 +223,7 @@ class PhotoProcessingWorker(
             applyHalationAndBloom(mutableBitmap, params.halation, params.bloom)
         }
         if (params.grain > 0.0f) {
-            applyGrainEffect(mutableBitmap, params.grain, params.grainSize)
+            applyGrainEffect(mutableBitmap, params.grain, params.grainSize, params.grainRoughness)
         }
 
         return mutableBitmap
@@ -296,19 +298,37 @@ class PhotoProcessingWorker(
         }
     }
     
-    private fun applyGrainEffect(bitmap: Bitmap, grainIntensity: Float, grainSize: Float) {
+    private fun applyGrainEffect(bitmap: Bitmap, grainIntensity: Float, grainSize: Float, grainRoughness: Float) {
         val pixels = IntArray(bitmap.width * bitmap.height)
         bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
-        val random = Random()
-        val grainAmount = (grainIntensity * 30).toInt()
         val w = bitmap.width
         val h = bitmap.height
         val block = max(1, grainSize.roundToInt())
+        fun hash(x: Int, y: Int): Int {
+            var n = x * 374761393 + y * 668265263
+            n = (n xor (n shr 13)) * 1274126177
+            return n xor (n shr 16)
+        }
+        fun valueNoise(ix: Int, iy: Int): Float = ((hash(ix, iy) and 0x7fffffff) / 2147483647.0f)
+        fun fbm(ix: Int, iy: Int): Float {
+            var sum = 0f
+            var amp = 0.6f
+            var sx = ix
+            var sy = iy
+            val decay = 0.45f + 0.30f * grainRoughness.coerceIn(0f, 1f)
+            repeat(4) {
+                sum += valueNoise(sx, sy) * amp
+                sx *= 2; sy *= 2
+                amp *= decay
+            }
+            return sum
+        }
         var y = 0
         while (y < h) {
             var x = 0
             while (x < w) {
-                val noise = random.nextInt(grainAmount * 2 + 1) - grainAmount
+                val n = fbm(x / block, y / block) - 0.5f
+                val noise = (n * (grainIntensity * 90f)).toInt()
                 val xMax = min(w, x + block)
                 val yMax = min(h, y + block)
                 var yy = y
@@ -316,10 +336,10 @@ class PhotoProcessingWorker(
                     var xx = x
                     while (xx < xMax) {
                         val idx = yy * w + xx
-                        val pixel = pixels[idx]
-                        val r = (android.graphics.Color.red(pixel) + noise).coerceIn(0,255)
-                        val g = (android.graphics.Color.green(pixel) + noise).coerceIn(0,255)
-                        val b = (android.graphics.Color.blue(pixel) + noise).coerceIn(0,255)
+                        val p = pixels[idx]
+                        val r = (android.graphics.Color.red(p) + noise).coerceIn(0,255)
+                        val g = (android.graphics.Color.green(p) + noise).coerceIn(0,255)
+                        val b = (android.graphics.Color.blue(p) + noise).coerceIn(0,255)
                         pixels[idx] = android.graphics.Color.rgb(r,g,b)
                         xx++
                     }
