@@ -53,6 +53,7 @@ class MainActivity : ComponentActivity() {
     private val cameraExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private var imageCapture: ImageCapture? = null
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
+    private var orientationEventListener: android.view.OrientationEventListener? = null
     
     // Background processing
     private lateinit var notificationManager: NotificationManager
@@ -94,7 +95,29 @@ class MainActivity : ComponentActivity() {
         startCamera()
         // Update film name display
         updateFilmNameDisplay()
+
+		// Enable orientation listener to align saved image orientation with device
+		if (orientationEventListener == null) {
+			orientationEventListener = object : android.view.OrientationEventListener(this) {
+				override fun onOrientationChanged(orientation: Int) {
+					if (orientation == android.view.OrientationEventListener.ORIENTATION_UNKNOWN) return
+					val rotation = when (orientation) {
+						in 45..134 -> Surface.ROTATION_270
+						in 135..224 -> Surface.ROTATION_180
+						in 225..314 -> Surface.ROTATION_90
+						else -> Surface.ROTATION_0
+					}
+					imageCapture?.targetRotation = rotation
+				}
+			}
+		}
+		orientationEventListener?.enable()
     }
+
+	override fun onPause() {
+		super.onPause()
+		orientationEventListener?.disable()
+	}
 
     private fun setupUI(glView: AspectRatioGLSurfaceView) {
         val renderer = glView.renderer
