@@ -1,7 +1,7 @@
 # Grain Camera (Android)
 
 Android CameraX + OpenGL ES 2.0 camera app that previews and captures with Fuji-like film simulations
-(Provia, Velvia, Astia, Classic Chrome, Pro Neg Std/Hi, Eterna, Classic Neg, Nostalgic Neg, Acros B&W)
+(ProView Neutral, Velora Vivid, Asteria Soft, Soft Chrome, Pro Portrait Std/Hi, Eternis Cine, Retro Negative, Nostalgia Negative, Acrux B&W)
 and tweakable **Halation**, **Bloom**, and **Grain** before capture.
 
 > NOTE: Film simulations here are tasteful approximations using tone curves, saturation and gentle split-toning.

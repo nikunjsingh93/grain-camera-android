@@ -47,6 +47,11 @@ import androidx.work.Data
 import java.util.concurrent.atomic.AtomicInteger
 import java.io.File
 import com.graincamera.gl.EffectParams
+import android.view.MotionEvent
+import java.util.concurrent.TimeUnit
+import androidx.camera.core.FocusMeteringAction
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory
+import androidx.camera.core.DisplayOrientedMeteringPointFactory
 
 class MainActivity : ComponentActivity() {
     private var cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -54,6 +59,9 @@ class MainActivity : ComponentActivity() {
     private var imageCapture: ImageCapture? = null
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private var orientationEventListener: android.view.OrientationEventListener? = null
+    private var camera: androidx.camera.core.Camera? = null
+    private var focusRingView: View? = null
+    private var focusRingHideRunnable: Runnable? = null
     
     // Background processing
     private lateinit var notificationManager: NotificationManager
@@ -149,6 +157,92 @@ class MainActivity : ComponentActivity() {
         
         // Initialize rule of thirds button state
         findViewById<ImageButton>(R.id.ruleOfThirdsBtn).isSelected = renderer.params.showRuleOfThirds
+
+		// Tap to focus on the camera view
+		glView.setCameraTouchListener { v, event ->
+			if (event.action == MotionEvent.ACTION_DOWN || event.action == MotionEvent.ACTION_UP) {
+				// Always show the focus ring immediately at the tap point
+				showFocusRing(event.x, event.y)
+
+				val currentCamera = camera ?: run {
+					// If camera not ready, hide the ring shortly
+					scheduleHideFocusRing(800L)
+					return@setCameraTouchListener true
+				}
+				val disp = this.display ?: (getSystemService(Context.WINDOW_SERVICE) as android.view.WindowManager).defaultDisplay
+				val factory = DisplayOrientedMeteringPointFactory(disp, currentCamera.cameraInfo, v.width.toFloat(), v.height.toFloat())
+				val point = factory.createPoint(event.x, event.y)
+				val action = FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF or FocusMeteringAction.FLAG_AE or FocusMeteringAction.FLAG_AWB)
+					.setAutoCancelDuration(3000, TimeUnit.MILLISECONDS)
+					.build()
+
+				val future = currentCamera.cameraControl.startFocusAndMetering(action)
+				future.addListener({
+					try {
+						val result = future.get()
+						if (!result.isFocusSuccessful) {
+							hideFocusRing()
+						} else {
+							// Turn ring green to indicate success, then hide after auto-cancel duration
+							focusRingView?.background = ContextCompat.getDrawable(this, R.drawable.focus_ring_active)
+							scheduleHideFocusRing(3000L)
+						}
+					} catch (e: Exception) {
+						hideFocusRing()
+					}
+				}, ContextCompat.getMainExecutor(this))
+				true
+			} else {
+				false
+			}
+		}
+    }
+
+    private fun showFocusRing(x: Float, y: Float) {
+        val glView: AspectRatioGLSurfaceView = findViewById(R.id.glView)
+        // Remove existing ring first
+        hideFocusRing()
+
+        val ring = View(this).apply {
+            background = ContextCompat.getDrawable(this@MainActivity, R.drawable.focus_ring)
+        }
+        val sizePx = (64 * resources.displayMetrics.density).toInt()
+        val lp = android.widget.FrameLayout.LayoutParams(sizePx, sizePx)
+        lp.leftMargin = (x - sizePx / 2f).toInt().coerceIn(0, glView.width - sizePx)
+        lp.topMargin = (y - sizePx / 2f).toInt().coerceIn(0, glView.height - sizePx)
+        ring.layoutParams = lp
+
+        glView.addView(ring)
+        focusRingView = ring
+
+        // Animate in
+        ring.scaleX = 0.85f
+        ring.scaleY = 0.85f
+        ring.alpha = 0f
+        ring.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(150).start()
+
+        // Failsafe hide
+        scheduleHideFocusRing(5000L)
+    }
+
+    private fun scheduleHideFocusRing(delayMs: Long) {
+        val glView: AspectRatioGLSurfaceView = findViewById(R.id.glView)
+        focusRingHideRunnable?.let { glView.removeCallbacks(it) }
+        val runnable = Runnable { hideFocusRing() }
+        focusRingHideRunnable = runnable
+        glView.postDelayed(runnable, delayMs)
+    }
+
+    private fun hideFocusRing() {
+        val glView: AspectRatioGLSurfaceView = findViewById(R.id.glView)
+        focusRingHideRunnable?.let { glView.removeCallbacks(it) }
+        focusRingHideRunnable = null
+        focusRingView?.let { view ->
+            view.animate().alpha(0f).setDuration(120).withEndAction {
+                glView.removeView(view)
+            }.start()
+        }
+        focusRingView = null
     }
 
     private fun startCamera() {
@@ -185,7 +279,7 @@ class MainActivity : ComponentActivity() {
 
             try {
                 cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
+                camera = cameraProvider.bindToLifecycle(
                     this, selector, preview, imageCapture
                 )
             } catch (e: Exception) {
@@ -678,7 +772,7 @@ class MainActivity : ComponentActivity() {
     private fun updateFilmNameDisplay() {
         val currentFilmName = FilmSettingsStore.getSelectedFilm(this)
         val film = com.graincamera.gl.FilmSim.values().firstOrNull { it.name == currentFilmName }
-        findViewById<TextView>(R.id.currentFilmName).text = film?.displayName ?: "PROVIA"
+        findViewById<TextView>(R.id.currentFilmName).text = film?.displayName ?: "ProView Neutral"
     }
 
 }

@@ -2,6 +2,8 @@ package com.graincamera
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.graincamera.gl.CameraGLSurfaceView
@@ -18,6 +20,8 @@ class AspectRatioGLSurfaceView @JvmOverloads constructor(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
         ))
+        // Container doesn't need to intercept by default; we'll attach listener to the inner GLSurfaceView
+        isClickable = false
     }
     
     val renderer: com.graincamera.gl.GLRenderer
@@ -27,6 +31,14 @@ class AspectRatioGLSurfaceView @JvmOverloads constructor(
         glSurfaceView.setZOrderOnTop(onTop)
     }
     
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        return false
+    }
+
+    fun setCameraTouchListener(listener: OnTouchListener) {
+        glSurfaceView.setOnTouchListener(listener)
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = MeasureSpec.getSize(heightMeasureSpec)

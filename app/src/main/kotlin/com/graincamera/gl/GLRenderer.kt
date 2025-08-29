@@ -378,16 +378,16 @@ data class EffectParams(
 )
 
 enum class FilmSim(val displayName: String, val film: Film) {
-    PROVIA("Provia / Standard", Film(contrast=1.0f, saturation=1.0f, shadowTint=0.00f, highlightTint=0.00f)),
-    VELVIA("Velvia / Vivid",   Film(contrast=1.15f, saturation=1.35f, shadowTint=-0.03f, highlightTint=0.02f)),
-    ASTIA("Astia / Soft",      Film(contrast=0.95f, saturation=0.95f, shadowTint=0.02f, highlightTint=0.04f)),
-    CLASSIC_CHROME("Classic Chrome", Film(contrast=1.05f, saturation=0.75f, shadowTint=0.02f, highlightTint=-0.02f)),
-    PRO_NEG_STD("Pro Neg Std", Film(contrast=0.95f, saturation=0.85f, shadowTint=0.01f, highlightTint=0.01f)),
-    PRO_NEG_HI("Pro Neg Hi",   Film(contrast=1.10f, saturation=0.9f, shadowTint=0.00f, highlightTint=0.01f)),
-    ETERNA("Eterna / Cinema",  Film(contrast=0.90f, saturation=0.65f, shadowTint=0.02f, highlightTint=-0.01f)),
-    CLASSIC_NEG("Classic Neg", Film(contrast=1.10f, saturation=0.8f, shadowTint=0.03f, highlightTint=-0.02f)),
-    NOSTALGIC_NEG("Nostalgic Neg", Film(contrast=0.95f, saturation=1.05f, shadowTint=0.04f, highlightTint=0.06f)),
-    ACROS("Acros B&W",         Film(contrast=1.10f, saturation=0.0f, shadowTint=0.00f, highlightTint=0.00f));
+    PROVIA("ProView Neutral", Film(contrast=1.0f, saturation=1.0f, shadowTint=0.00f, highlightTint=0.00f)),
+    VELVIA("Velora Vivid",   Film(contrast=1.15f, saturation=1.35f, shadowTint=-0.03f, highlightTint=0.02f)),
+    ASTIA("Asteria Soft",      Film(contrast=0.95f, saturation=0.95f, shadowTint=0.02f, highlightTint=0.04f)),
+    CLASSIC_CHROME("Soft Chrome", Film(contrast=1.05f, saturation=0.75f, shadowTint=0.02f, highlightTint=-0.02f)),
+    PRO_NEG_STD("Pro Portrait Std", Film(contrast=0.95f, saturation=0.85f, shadowTint=0.01f, highlightTint=0.01f)),
+    PRO_NEG_HI("Pro Portrait Hi",   Film(contrast=1.10f, saturation=0.9f, shadowTint=0.00f, highlightTint=0.01f)),
+    ETERNA("Eternis Cine",  Film(contrast=0.90f, saturation=0.65f, shadowTint=0.02f, highlightTint=-0.01f)),
+    CLASSIC_NEG("Retro Negative", Film(contrast=1.10f, saturation=0.8f, shadowTint=0.03f, highlightTint=-0.02f)),
+    NOSTALGIC_NEG("Nostalgia Negative", Film(contrast=0.95f, saturation=1.05f, shadowTint=0.04f, highlightTint=0.06f)),
+    ACROS("Acrux B&W",         Film(contrast=1.10f, saturation=0.0f, shadowTint=0.00f, highlightTint=0.00f));
     companion object {
         val valuesList = values().toList()
     }
