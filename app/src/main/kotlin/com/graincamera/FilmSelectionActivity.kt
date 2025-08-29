@@ -66,7 +66,7 @@ class FilmSelectionActivity : ComponentActivity() {
             val grain = findViewById<SeekBar>(R.id.seekGrain).progress / 100f
             val grainSize = 1f + (findViewById<SeekBar>(R.id.seekGrainSize).progress / 100f) * 1f
             val grainRoughness = findViewById<SeekBar>(R.id.seekGrainRoughness).progress / 100f
-            val exposure = (findViewById<SeekBar>(R.id.seekExposure).progress / 100f) * 2f - 1f // -1..+1 stops
+            val exposure = (findViewById<SeekBar>(R.id.seekExposure).progress / 100f) * 4f - 2f // -2..+2 stops
             val contrast = 0.5f + (findViewById<SeekBar>(R.id.seekContrast).progress / 100f) // 0.5..1.5
             val saturationAdj = 1.2f * (findViewById<SeekBar>(R.id.seekSaturation).progress / 100f) // 0..1.2
             val temperature = (findViewById<SeekBar>(R.id.seekTemperature).progress / 100f) * 2f - 1f // -1..+1
@@ -113,7 +113,7 @@ class FilmSelectionActivity : ComponentActivity() {
         val clampedGs = settings.grainSize.coerceIn(1f, 2f)
         findViewById<SeekBar>(R.id.seekGrainSize).progress = (((clampedGs - 1f) / 1f) * 100f).toInt().coerceIn(0, 100)
         findViewById<SeekBar>(R.id.seekGrainRoughness).progress = (settings.grainRoughness * 100).toInt()
-        findViewById<SeekBar>(R.id.seekExposure).progress = (((settings.exposure + 1f) / 2f) * 100f).toInt().coerceIn(0, 100)
+        findViewById<SeekBar>(R.id.seekExposure).progress = (((settings.exposure + 2f) / 4f) * 100f).toInt().coerceIn(0, 100)
         findViewById<SeekBar>(R.id.seekContrast).progress = (((settings.contrast - 0.5f) / 1f) * 100f).toInt().coerceIn(0, 100)
         findViewById<SeekBar>(R.id.seekSaturation).progress = ((settings.saturationAdj / 1.2f) * 100).toInt().coerceIn(0, 100)
         findViewById<SeekBar>(R.id.seekTemperature).progress = (((settings.temperature + 1f) / 2f) * 100f).toInt().coerceIn(0, 100)
@@ -209,7 +209,7 @@ object FilmSettingsStore {
         val g = d.getFloat(k + "_g", 0.15f)
         val gs = d.getFloat(k + "_gs", 1.5f).coerceIn(1f, 2f)
         val gr = d.getFloat(k + "_gr", 0.5f)
-        val ex = d.getFloat(k + "_ex", 0f).coerceIn(-1f, 1f)
+        val ex = d.getFloat(k + "_ex", 0f).coerceIn(-2f, 2f)
         val ct = d.getFloat(k + "_ct", 1.0f).coerceIn(0.5f, 1.5f)
         val sa = d.getFloat(k + "_sa", 1.0f).coerceIn(0f, 2f)
         val tp = d.getFloat(k + "_tp", 0.0f).coerceIn(-1f, 1f)
@@ -224,7 +224,7 @@ object FilmSettingsStore {
             .putFloat(k + "_g", g)
             .putFloat(k + "_gs", gs.coerceIn(1f, 2f))
             .putFloat(k + "_gr", gr)
-            .putFloat(k + "_ex", ex.coerceIn(-1f, 1f))
+            .putFloat(k + "_ex", ex.coerceIn(-2f, 2f))
             .putFloat(k + "_ct", ct.coerceIn(0.5f, 1.5f))
             .putFloat(k + "_sa", sa.coerceIn(0f, 2f))
             .putFloat(k + "_tp", tp.coerceIn(-1f, 1f))
