@@ -144,6 +144,9 @@ class MainActivity : ComponentActivity() {
             
             // Update button state
             findViewById<ImageButton>(R.id.ruleOfThirdsBtn).isSelected = newShowRuleOfThirds
+
+            // Persist setting
+            FilmSettingsStore.setRuleOfThirds(this, newShowRuleOfThirds)
         }
 
         findViewById<View>(R.id.switchBtn).setOnClickListener {
@@ -155,8 +158,10 @@ class MainActivity : ComponentActivity() {
         // Update film name display
         updateFilmNameDisplay()
         
-        // Initialize rule of thirds button state
-        findViewById<ImageButton>(R.id.ruleOfThirdsBtn).isSelected = renderer.params.showRuleOfThirds
+        // Initialize rule of thirds from persisted setting
+        val persistedRuleOfThirds = FilmSettingsStore.getRuleOfThirds(this)
+        renderer.params = renderer.params.copy(showRuleOfThirds = persistedRuleOfThirds)
+        findViewById<ImageButton>(R.id.ruleOfThirdsBtn).isSelected = persistedRuleOfThirds
 
 		// Tap-to-focus
 		glView.setCameraTouchListener(android.view.View.OnTouchListener { v, event ->

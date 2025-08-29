@@ -138,6 +138,7 @@ private class FilmPagerAdapter(
 
 object FilmSettingsStore {
     private const val KEY_SELECTED = "selected_film"
+    private const val KEY_RULE_OF_THIRDS = "rule_of_thirds"
     private fun key(film: String) = "film_settings_" + film
     data class Settings(val halation: Float, val bloom: Float, val grain: Float)
     fun getSelectedFilm(ctx: android.content.Context): String {
@@ -160,6 +161,16 @@ object FilmSettingsStore {
         val d = android.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
         val k = key(film)
         d.edit().putFloat(k + "_h", h).putFloat(k + "_b", b).putFloat(k + "_g", g).apply()
+    }
+
+    fun getRuleOfThirds(ctx: android.content.Context): Boolean {
+        val d = android.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
+        return d.getBoolean(KEY_RULE_OF_THIRDS, false)
+    }
+
+    fun setRuleOfThirds(ctx: android.content.Context, value: Boolean) {
+        val d = android.preference.PreferenceManager.getDefaultSharedPreferences(ctx)
+        d.edit().putBoolean(KEY_RULE_OF_THIRDS, value).apply()
     }
 }
 
