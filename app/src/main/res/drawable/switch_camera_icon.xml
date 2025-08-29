@@ -10,8 +10,8 @@
     <!-- Camera icon -->
     <item android:gravity="center">
         <vector
-            android:width="24dp"
-            android:height="24dp"
+            android:width="18dp"
+            android:height="18dp"
             android:viewportWidth="24"
             android:viewportHeight="24">
             <path
